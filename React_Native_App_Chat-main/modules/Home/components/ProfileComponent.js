@@ -31,7 +31,7 @@ const ProfileComponent = () =>{
     signOut(auth).then(() => {
       // Sign-out successful.
       console.log("Sign-out successful");
-      navigation.navigate("Login");
+      //navigation.replace("Login");
     }).catch((error) => {
       // An error happened.
     });
@@ -53,7 +53,7 @@ const ProfileComponent = () =>{
         </Modal>
         <View style={styles.avatar}>
           <Avatar.Image size={height*0.2} source={require('../../../src/images/Avatar/Profile.jpg')} />
-          <View><Text style={{color : 'black',fontSize :20}}>TCheng</Text></View>
+          <View><Text style={{color : 'black',fontSize :20}}>{auth.currentUser.email}</Text></View>
         </View>
         <View style={styles.viewSet}>
            {

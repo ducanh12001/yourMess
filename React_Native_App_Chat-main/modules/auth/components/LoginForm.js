@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import {  Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableWithoutFeedback, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { Card, TextInput,Button } from 'react-native-paper';
-import { NavigationContainer} from '@react-navigation/native';
-import { Actions } from 'react-native-router-flux';
 import { useNavigation } from '@react-navigation/core';
 import Ionicons from'react-native-vector-icons/Ionicons';
 import { auth } from '../../../src/firebase/config';
@@ -16,29 +14,16 @@ const LoginForm = () =>{
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const [isUser, setUser] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        //const uid = user.uid;
-        setUser(true);
-        navigation.navigate("Home");
-      } else {
-        // User is signed out
-      }
-    });
-    return unsubscribe
-  }, [])
-
   const signInUser=() => {
+    if (email === '' || password === '') {
+      alert("Please enter details");
+    }
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed in 
         const user = userCredential.user;
         setIsSignIn(true);
         console.log("ok");
-        navigation.navigate('Home');
+        //navigation.navigate('Home');
       })
       .catch((error) => {
         const errorCode = error.code;

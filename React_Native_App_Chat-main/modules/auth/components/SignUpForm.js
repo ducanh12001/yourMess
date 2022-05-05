@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { AuthNavigatorList, StackNavigatorList } from '../../../types';
 import { auth } from '../../../src/firebase/config';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
@@ -14,25 +12,30 @@ const SignUpForm = () =>{
     const [isSignUp, setIsSignUp] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
 
     const {width} = useWindowDimensions();
 
     const signUpUser=() => {
+      if (email === '' || password === '') {
+        alert("Please enter details");
+      }
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // Signed in 
           const user = userCredential.user;
+          user.updateProfile({
+            displayName: name
+          })
           setIsSignUp(true);
           console.log("ok");
-          navigation.navigate("Login");
+          //navigation.navigate("Login");
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
           if (error.code === 'auth/email-already-in-use') {
             alert('That email address is already in use!');
-          }
-          if (error.code === 'auth/invalid-email') {
+          } else if (error.code === 'auth/invalid-email' && email != '') {
             alert('That email address is invalid!');
           }
         });
@@ -62,12 +65,11 @@ const SignUpForm = () =>{
         </View>
         <View style={styles.viewInput}>
           <TextInput
-              label="Repeat Password"
+              label="Nick name"
               mode="flat"
-              value={password}
-              secureTextEntry
+              value={name}
               theme={{ roundness: 0 }}
-              onChangeText={text => setPassword(text)}
+              onChangeText={text => setName(text)}
           />
         </View>
 
@@ -80,8 +82,8 @@ const SignUpForm = () =>{
         </Button>
         <Text onPress={() =>{
             navigation.navigate('Login')
-        }} style={[styles.textOr,{marginLeft : width*0.2}]}>
-            if you have account, to login
+        }} style={[styles.textOr,{marginLeft : width*0.2, color:'green'}]}>
+            If you have account, to login
         </Text>
       </View>
     )
