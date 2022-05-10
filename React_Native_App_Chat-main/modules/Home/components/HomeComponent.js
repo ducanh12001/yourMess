@@ -1,13 +1,19 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Appbar, Avatar, Searchbar } from 'react-native-paper';
 
 const HomeComponent = () =>{
+    const navigation = useNavigation();
 
     const [search,setSearch] = React.useState('');
 
     const handleChangeSearch = (e) =>{
         setSearch(e.target.value)
+    }
+
+    const enterChat = (id) =>{
+        navigation.navigate('Chat');
     }
     
     return(
@@ -30,78 +36,6 @@ const HomeComponent = () =>{
                     </View>
                     <View>
                        <Text style={styles.viewName}>yêu Đạt quá 00 </Text>
-                       <Text style = {styles.viewMes}>kkk</Text>
-                    </View>
-                </View>
-                <View style = {styles.viewMember}> 
-                    <View>
-                      <Avatar.Image size={60} source={require('../../../src/images/Avatar/Avatar.jpg')} />
-                    </View>
-                    <View>
-                       <Text style={styles.viewName}>yêu Đạt quá 01</Text>
-                       <Text style = {styles.viewMes}>kkk</Text>
-                    </View>
-                </View>
-                <View style = {styles.viewMember}> 
-                    <View>
-                      <Avatar.Image size={60} source={require('../../../src/images/Avatar/Avatar.jpg')} />
-                    </View>
-                    <View>
-                       <Text style={styles.viewName}>yêu Đạt quá 02</Text>
-                       <Text style = {styles.viewMes}>kkk</Text>
-                    </View>
-                </View>
-                <View style = {styles.viewMember}> 
-                    <View>
-                      <Avatar.Image size={60} source={require('../../../src/images/Avatar/Avatar.jpg')} />
-                    </View>
-                    <View>
-                       <Text style={styles.viewName}>yêu Đạt quá 02</Text>
-                       <Text style = {styles.viewMes}>kkk</Text>
-                    </View>
-                </View>
-                <View style = {styles.viewMember}> 
-                    <View>
-                      <Avatar.Image size={60} source={require('../../../src/images/Avatar/Avatar.jpg')} />
-                    </View>
-                    <View>
-                       <Text style={styles.viewName}>yêu Đạt quá 02</Text>
-                       <Text style = {styles.viewMes}>kkk</Text>
-                    </View>
-                </View>
-                <View style = {styles.viewMember}> 
-                    <View>
-                      <Avatar.Image size={60} source={require('../../../src/images/Avatar/Avatar.jpg')} />
-                    </View>
-                    <View>
-                       <Text style={styles.viewName}>yêu Đạt quá 02</Text>
-                       <Text style = {styles.viewMes}>kkk</Text>
-                    </View>
-                </View>
-                <View style = {styles.viewMember}> 
-                    <View>
-                      <Avatar.Image size={60} source={require('../../../src/images/Avatar/Avatar.jpg')} />
-                    </View>
-                    <View>
-                       <Text style={styles.viewName}>yêu Đạt quá 02</Text>
-                       <Text style = {styles.viewMes}>kkk</Text>
-                    </View>
-                </View>
-                <View style = {styles.viewMember}> 
-                    <View>
-                      <Avatar.Image size={60} source={require('../../../src/images/Avatar/Avatar.jpg')} />
-                    </View>
-                    <View>
-                       <Text style={styles.viewName}>yêu Đạt quá 02</Text>
-                       <Text style = {styles.viewMes}>kkk</Text>
-                    </View>
-                </View>
-                <View style = {styles.viewMember}> 
-                    <View>
-                      <Avatar.Image size={60} source={require('../../../src/images/Avatar/Avatar.jpg')} />
-                    </View>
-                    <View>
-                       <Text style={styles.viewName}>yêu Đạt quá 02</Text>
                        <Text style = {styles.viewMes}>kkk</Text>
                     </View>
                 </View>

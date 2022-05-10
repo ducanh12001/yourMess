@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import LoginScreen from './modules/auth/screens/LoginScreen';
 import HomeScreen from './modules/Home/screens/HomeScreens';
 import {createStackNavigator} from '@react-navigation/stack';
-import messengerScreen from './modules/Messenger/screens/messengerScreen';
 import SignUpScreen from './modules/auth/screens/SingUpScreen';
 
+import ChatScreen from './modules/Home/components/ChatScreen';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './src/firebase/config';
 
@@ -14,6 +14,7 @@ function AppStack() {
   return (
     <Stack.Navigator initialRouteName='Home' screenOptions={{ headerShown: false }} >
       <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Chat" component={ChatScreen} />
     </Stack.Navigator> 
   )
 }

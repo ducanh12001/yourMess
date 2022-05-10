@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { auth } from '../../../src/firebase/config';
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from '../../../src/firebase/config';
+import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { ref, set } from 'firebase/database';
 
 const SignUpForm = () =>{
-
     const navigation = useNavigation();
 
     const [isSignUp, setIsSignUp] = useState(false);
@@ -16,19 +16,24 @@ const SignUpForm = () =>{
 
     const {width} = useWindowDimensions();
 
+    function writeUserData(userId, name, email, imageUrl) {
+      set(ref(db, 'users/' + userId), {
+        uid: userId,
+        username: name,
+        email: email,
+        profile_picture : imageUrl
+      });
+    }
+
     const signUpUser=() => {
       if (email === '' || password === '') {
         alert("Please enter details");
       }
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          const user = userCredential.user;
-          user.updateProfile({
-            displayName: name
-          })
+          //const user = userCredential.user;
           setIsSignUp(true);
-          console.log("ok");
-          //navigation.navigate("Login");
+          //navigation.navigate('Login');
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -38,7 +43,12 @@ const SignUpForm = () =>{
           } else if (error.code === 'auth/invalid-email' && email != '') {
             alert('That email address is invalid!');
           }
-        });
+        }).then(() => {
+          var uid = auth.currentUser.uid;
+          writeUserData(uid, name, email, '');
+        }).catch(err => {
+          console.log(err);
+        })
     }
 
     return (

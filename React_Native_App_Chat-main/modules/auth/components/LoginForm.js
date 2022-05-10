@@ -22,7 +22,7 @@ const LoginForm = () =>{
       .then((userCredential) => {
         const user = userCredential.user;
         setIsSignIn(true);
-        console.log("ok");
+        console.log("Login");
         //navigation.navigate('Home');
       })
       .catch((error) => {

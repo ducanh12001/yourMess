@@ -23,6 +23,7 @@
     "react-native": "0.68.0",
     "react-native-gesture-handler": "^2.3.2",
     "react-native-gradient-header": "^0.2.1",
+    "react-native-image-picker": "^4.8.2",
     "react-native-modal": "^13.0.1",
     "react-native-modals": "^0.22.3",
     "react-native-paper": "^4.12.0",
