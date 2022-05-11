@@ -11,10 +11,6 @@ const HomeComponent = () =>{
     const handleChangeSearch = (e) =>{
         setSearch(e.target.value)
     }
-
-    const enterChat = (id) =>{
-        navigation.navigate('Chat');
-    }
     
     return(
         <View>

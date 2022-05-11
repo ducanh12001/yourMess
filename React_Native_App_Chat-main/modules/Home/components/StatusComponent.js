@@ -9,6 +9,13 @@ const StatusComponent = () =>{
     const navigation = useNavigation()
 
     const [allUsers, setAllUsers] = useState([]);
+    const [search, setSearch] = useState('');
+    const [userBack, setUserBack] = useState('');
+
+    const searchUser = (val) => {
+        setSearch(val);
+        setAllUsers(userBack.filter((item) => item.username.toLowerCase().match(val.toLowerCase())));
+    }
 
     useEffect(() => {
         const dbRef = ref(db, '/users');
@@ -23,11 +30,13 @@ const StatusComponent = () =>{
                 } else {
                     users.push({ 
                         username: childData.username,
-                        uid: childData.uid
+                        uid: childData.uid,
+                        profileImage: childData.profile_picture
                     })
                 }
             });
             setAllUsers(users);
+            setUserBack(users);
         }, {
             onlyOnce: true
         });
@@ -36,20 +45,24 @@ const StatusComponent = () =>{
 
     return (
         <View style={styles.container}>
-            <Searchbar placeholder="Search" style={{borderRadius : 50, margin : 10,}} />
+            <Searchbar 
+                placeholder="Search user" 
+                style={{borderRadius : 50, margin : 10,}} 
+                onChangeText={val => searchUser(val)}
+                value={search}
+            />
             <FlatList
                 alwaysBounceVertical={false}
                 style={{padding: 5}}
                 data={allUsers}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({item}) => {return (
-                    <TouchableOpacity style={{flexDirection: 'row', borderBottomColor: 'gray', borderBottomWidth: 0.5, padding:5}}>
+                    <TouchableOpacity onPress={() => navigation.navigate('ChatScreen', {Username: item.username, pImage: item.profileImage})} style={{flexDirection: 'row', borderBottomColor: 'gray', borderBottomWidth: 0.5, padding:5}}>
                         <View style={{width: '15%', alignItems:'center', justifyContent: 'center'}}>
-                            <Image style={{width: 50, height: 50, borderRadius: 50/ 2}}  source={require('../../../src/images/Avatar/Profile.jpg')}></Image>
+                            <Image style={{width: 50, height: 50, borderRadius: 50/ 2}}  source={{uri:item.profileImage}}></Image>
                         </View>
                         <View style={{width: '85%', alignItems:'flex-start', marginLeft: 10}}>
-                            <Text style={{color:'black', fontSize: 18, fontWeight:'bold'}}>{item.username}</Text>
-                            <Text style={{color:'gray', fontSize: 15}}>aaaaaa</Text>
+                            <Text style={{color:'black', fontSize: 20, fontWeight:'bold'}}>{item.username}</Text>
                         </View>
                     </TouchableOpacity>
                 )}}

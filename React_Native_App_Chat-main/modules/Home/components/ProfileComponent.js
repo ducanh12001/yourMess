@@ -9,8 +9,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import {launchImageLibrary} from 'react-native-image-picker';
 import { auth, db, storage } from '../../../src/firebase/config';
 import { signOut } from "firebase/auth";
-import { child, get, onValue, ref, update } from 'firebase/database';
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { child, get, onValue, ref, set, update } from 'firebase/database';
+import * as storageItem from "firebase/storage";
 
 const ProfileComponent = () => {
   const navigation = useNavigation();
@@ -46,8 +46,11 @@ const ProfileComponent = () => {
       if (snapshot.exists()) {
         //console.log(snapshot.val());
         setName(snapshot.val().username);
-        setImgUri(snapshot.val().profile_picture);
-        //updateProfileImg();
+        if (snapshot.val().profile_picture == null) {
+          setImage('https://cdn-icons-png.flaticon.com/512/149/149071.png');
+        } else {
+          setImage(snapshot.val().profile_picture);
+        }
       } else {
         console.log("No data available");
       }
@@ -56,23 +59,26 @@ const ProfileComponent = () => {
     });
   }, []);
 
-  const [imgUri, setImgUri] = useState('');
+  const [image, setImage] = useState('');
 
   const updateProfileImg = async () => {
     launchImageLibrary('photo', (response) => {
-      //setImgUri(response.assets[0].uri);
-      //console.log(response.assets[0].uri)
       if (response.didCancel) {
         console.log("cancel img");
       } else if(response.errorCode == 'permission') {
         console.log("permission denied");
       } else {
-        const img = response.assets[0].uri;
+        const imgUri = response.assets[0].uri;
+        console.log(imgUri);
         update(ref(db, `users/${auth.currentUser.uid}`), {
-          profile_picture: img
-        });
+          profile_picture: imgUri
+        }).then(() => {
+          setImage(imgUri);
+        }).catch((error) => {
+
+        })
       }
-    })
+    });
   }
   
   return (
@@ -90,7 +96,7 @@ const ProfileComponent = () => {
           </View>
         </Modal>
         <View style={styles.avatar}>
-          <Avatar.Image size={height * 0.15} source={{uri : imgUri === '' ? 'https://cdn-icons-png.flaticon.com/512/149/149071.png' : imgUri}} />
+          <Avatar.Image size={height * 0.15} source={{uri : image === "" ? 'https://cdn-icons-png.flaticon.com/512/149/149071.png' : image}}/>
           <View><Text style={{ color: 'black', fontSize: 20 }}>{name}</Text></View>
         </View>
         <View style={styles.viewSet}>
@@ -127,7 +133,7 @@ const ProfileComponent = () => {
             </View>
           }
           <View style={styles.textSet}>
-            <Text>Set status</Text>
+            <Text>Set notification</Text>
           </View>
           <View style={styles.icon}><Switch value={notification} onValueChange={toggleNotification} /></View>
         </View>
@@ -158,6 +164,7 @@ const styles = StyleSheet.create({
   container: {
     display: 'flex',
     flexDirection: 'column',
+    height: '100%',
   },
   avatar: {
     justifyContent: 'center',
