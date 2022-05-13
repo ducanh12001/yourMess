@@ -1,11 +1,12 @@
 import { useNavigation } from '@react-navigation/core';
-import { onValue, ref, push } from 'firebase/database';
+import { onValue, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
 import { Searchbar } from 'react-native-paper';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import { auth, db } from '../../../src/firebase/config';
 
-const StatusComponent = () =>{
+const StatusComponent = () => {
     const navigation = useNavigation()
 
     const [allUsers, setAllUsers] = useState([]);
@@ -28,10 +29,11 @@ const StatusComponent = () =>{
                 if (childData.uid === uid) {
 
                 } else {
-                    users.push({ 
+                    users.push({
                         username: childData.username,
                         uid: childData.uid,
-                        profileImage: childData.profile_picture
+                        profileImage: childData.profile_picture,
+                        status: childData.status
                     })
                 }
             });
@@ -45,34 +47,51 @@ const StatusComponent = () =>{
 
     return (
         <View style={styles.container}>
-            <Searchbar 
-                placeholder="Search user" 
-                style={{borderRadius : 50, margin : 10,}} 
+            <Searchbar
+                placeholder="Search user"
+                style={{ borderRadius: 50, margin: 10, }}
                 onChangeText={val => searchUser(val)}
                 value={search}
             />
             <FlatList
                 alwaysBounceVertical={false}
-                style={{padding: 5}}
+                style={{ padding: 5 }}
                 data={allUsers}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={({item}) => {return (
-                    <TouchableOpacity onPress={() => navigation.navigate('ChatScreen', {Username: item.username, pImage: item.profileImage, FriendId: item.uid})} style={{flexDirection: 'row', borderBottomColor: 'gray', borderBottomWidth: 0.5, padding:5}}>
-                        <View style={{width: '15%', alignItems:'center', justifyContent: 'center'}}>
-                            <Image style={{width: 50, height: 50, borderRadius: 50/ 2}}  source={{uri:item.profileImage}}></Image>
-                        </View>
-                        <View style={{width: '85%', alignItems:'flex-start', marginLeft: 10}}>
-                            <Text style={{color:'black', fontSize: 20, fontWeight:'bold'}}>{item.username}</Text>
-                        </View>
-                    </TouchableOpacity>
-                )}}
+                renderItem={({ item }) => {
+                    return (
+                        <>
+                            {item.uid === undefined ?
+                                <View></View>
+                                :
+                                <TouchableOpacity onPress={() => navigation.navigate('ChatScreen', { Username: item.username, pImage: item.profileImage, FriendId: item.uid })} style={{ flexDirection: 'row', borderBottomColor: 'gray', borderBottomWidth: 0.5, padding: 5 }}>
+                                    <View style={{ width: '15%', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Image style={{ width: 50, height: 50, borderRadius: 50 / 2 }} source={{ uri: item.profileImage }}></Image>
+                                    </View>
+                                    <View style={{ width: '75%', alignItems: 'flex-start', marginLeft: 10 }}>
+                                        <Text style={{ color: 'black', fontSize: 20, fontWeight: 'bold' }}>{item.username}</Text>
+                                    </View>
+                                    <View style={{ width: '10%', justifyContent: 'center', alignItems: 'center' }}>
+                                        {item.status === false ?
+                                            <Ionicons name="radio-button-on" color='gray' size={18} />
+                                            :
+                                            <Ionicons name="radio-button-on" color='green' size={18} />
+                                        }
+                                    </View>
+                                </TouchableOpacity>
+
+                            }
+                        </>
+                    )
+                }}
             />
+
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-    container :{
+    container: {
         flex: 1,
     }
 })

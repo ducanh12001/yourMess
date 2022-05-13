@@ -17,7 +17,7 @@ const HomeComponent = () =>{
             <Appbar.Header style={styles.Appbar}>
                <Appbar.Action icon="menu" />
                <Appbar.Content title="Chat App" />
-               <Avatar.Image size={40} source={require('../../../src/images/Avatar/Profile.jpg')} />
+               <Avatar.Image size={40} source={require('../../../src/images/user.png')} />
             </Appbar.Header>
             <Searchbar
                 style={styles.search}
@@ -28,10 +28,10 @@ const HomeComponent = () =>{
             <ScrollView>
                 <View style = {styles.viewMember}> 
                     <View>
-                      <Avatar.Image size={60} source={require('../../../src/images/Avatar/Avatar.jpg')} />
+                      <Avatar.Image size={60} source={require('../../../src/images/user.png')} />
                     </View>
                     <View>
-                       <Text style={styles.viewName}>yêu Đạt quá 00 </Text>
+                       <Text style={styles.viewName}>AAA</Text>
                        <Text style = {styles.viewMes}>kkk</Text>
                     </View>
                 </View>

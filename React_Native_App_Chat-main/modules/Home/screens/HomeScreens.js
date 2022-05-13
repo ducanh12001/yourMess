@@ -12,7 +12,7 @@ import { TabNavigatorParamsList } from '../../../types';
 
 const Tab= createBottomTabNavigator();
 
-const BottomNavigationComponent = ({navigation}) =>{
+const BottomNavigationComponent = () =>{
 
     return (
         <Tab.Navigator screenOptions={{ headerShown: false }}>

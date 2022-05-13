@@ -9,7 +9,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { launchImageLibrary } from 'react-native-image-picker';
 import { auth, db, storage } from '../../../src/firebase/config';
 import { signOut } from "firebase/auth";
-import { child, get, onValue, ref, set, update } from 'firebase/database';
+import { child, get, ref, update } from 'firebase/database';
 import * as storageItem from "firebase/storage";
 
 const ProfileComponent = () => {
@@ -31,9 +31,15 @@ const ProfileComponent = () => {
   }
 
   const SignOutUser = () => {
+    const currentUser = auth.currentUser.uid;
     signOut(auth).then(() => {
-      console.log("Sign-out successful");
-      //navigation.replace("Login");
+      update(ref(db, `users/${currentUser}`), {
+        status: false,
+      }).then(() => {
+        console.log("off");
+      }).catch((error) => {
+        alert("off" + error);
+      })
     }).catch((error) => {
       console.log("Out Error: " + error);
     });
@@ -69,7 +75,7 @@ const ProfileComponent = () => {
         console.log("permission denied");
       } else {
         const imgUri = response.assets[0].uri;
-        console.log(imgUri);
+        //console.log(response);
         update(ref(db, `users/${auth.currentUser.uid}`), {
           profile_picture: imgUri
         }).then(() => {

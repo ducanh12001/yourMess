@@ -10,7 +10,6 @@ const LoginForm = () =>{
 
   const navigation = useNavigation();
 
-  const [isSignIn, setIsSignIn] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -21,9 +20,7 @@ const LoginForm = () =>{
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        setIsSignIn(true);
         console.log("Login");
-        //navigation.navigate('Home');
       })
       .catch((error) => {
         const errorCode = error.code;
