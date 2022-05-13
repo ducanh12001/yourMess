@@ -57,7 +57,7 @@ const StatusComponent = () =>{
                 data={allUsers}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({item}) => {return (
-                    <TouchableOpacity onPress={() => navigation.navigate('ChatScreen', {Username: item.username, pImage: item.profileImage})} style={{flexDirection: 'row', borderBottomColor: 'gray', borderBottomWidth: 0.5, padding:5}}>
+                    <TouchableOpacity onPress={() => navigation.navigate('ChatScreen', {Username: item.username, pImage: item.profileImage, FriendId: item.uid})} style={{flexDirection: 'row', borderBottomColor: 'gray', borderBottomWidth: 0.5, padding:5}}>
                         <View style={{width: '15%', alignItems:'center', justifyContent: 'center'}}>
                             <Image style={{width: 50, height: 50, borderRadius: 50/ 2}}  source={{uri:item.profileImage}}></Image>
                         </View>

@@ -6,7 +6,7 @@ import Modal from 'react-native-modal/dist/modal';
 import { Appbar, Avatar, Button, Switch } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import {launchImageLibrary} from 'react-native-image-picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 import { auth, db, storage } from '../../../src/firebase/config';
 import { signOut } from "firebase/auth";
 import { child, get, onValue, ref, set, update } from 'firebase/database';
@@ -40,7 +40,7 @@ const ProfileComponent = () => {
   }
 
   const [name, setName] = useState('');
-  
+
   useEffect(() => {
     get(child(ref(db), `users/${auth.currentUser.uid}`)).then((snapshot) => {
       if (snapshot.exists()) {
@@ -65,7 +65,7 @@ const ProfileComponent = () => {
     launchImageLibrary('photo', (response) => {
       if (response.didCancel) {
         console.log("cancel img");
-      } else if(response.errorCode == 'permission') {
+      } else if (response.errorCode == 'permission') {
         console.log("permission denied");
       } else {
         const imgUri = response.assets[0].uri;
@@ -80,23 +80,27 @@ const ProfileComponent = () => {
       }
     });
   }
-  
+
   return (
     <View style={styles.container}>
       <Appbar.Header style={styles.Appbar}>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content title="Profile" />
       </Appbar.Header>
-      <ScrollView style={{height: '100%'}}>
+      <ScrollView style={{ height: '100%' }}>
         <Modal isVisible={visibleModal} style={styles.modal}>
-          <View><Text>You want exit this app</Text></View>
-          <View>
-            <Button mode="contained" onPress={SignOutUser}>Ok</Button>
-            <Button mode="contained" onPress={hideModal}>Cancel</Button>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={{ fontSize: 18, marginTop: 20 }}>You want exit this app</Text>
+            </View>
+            <View style={styles.modalBody}>
+              <Button style={{ margin: 5, width: '40%' }} mode="contained" onPress={SignOutUser}>Ok</Button>
+              <Button style={{ margin: 5, width: '40%' }} mode="contained" onPress={hideModal}>Cancel</Button>
+            </View>
           </View>
         </Modal>
         <View style={styles.avatar}>
-          <Avatar.Image size={height * 0.15} source={{uri : image === "" ? 'https://cdn-icons-png.flaticon.com/512/149/149071.png' : image}}/>
+          <Avatar.Image size={height * 0.15} source={{ uri: image === "" ? 'https://cdn-icons-png.flaticon.com/512/149/149071.png' : image }} />
           <View><Text style={{ color: 'black', fontSize: 20 }}>{name}</Text></View>
         </View>
         <View style={styles.viewSet}>
@@ -190,9 +194,22 @@ const styles = StyleSheet.create({
     flex: 5,
     margin: 20
   },
-  modal: {
-    backgroundColor: 'white',
-    display: 'flex'
+  modalContainer: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#000",
+    borderStyle: "solid",
+  },
+  modalHeader: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalBody: {
+    justifyContent: "center",
+    paddingHorizontal: 15,
+    minHeight: 150,
+    alignItems: "center",
   }
 })
 
