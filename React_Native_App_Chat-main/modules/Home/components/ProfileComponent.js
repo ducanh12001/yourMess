@@ -52,11 +52,7 @@ const ProfileComponent = () => {
       if (snapshot.exists()) {
         //console.log(snapshot.val());
         setName(snapshot.val().username);
-        if (snapshot.val().profile_picture == null) {
-          setImage('https://cdn-icons-png.flaticon.com/512/149/149071.png');
-        } else {
-          setImage(snapshot.val().profile_picture);
-        }
+        setImage(snapshot.val().profile_picture);
       } else {
         console.log("No data available");
       }
@@ -68,20 +64,41 @@ const ProfileComponent = () => {
   const [image, setImage] = useState('');
 
   const updateProfileImg = async () => {
-    launchImageLibrary('photo', (response) => {
+    launchImageLibrary('photo', async (response) => {
       if (response.didCancel) {
         console.log("cancel img");
       } else if (response.errorCode == 'permission') {
         console.log("permission denied");
       } else {
         const imgUri = response.assets[0].uri;
-        //console.log(response);
-        update(ref(db, `users/${auth.currentUser.uid}`), {
-          profile_picture: imgUri
-        }).then(() => {
-          setImage(imgUri);
-        }).catch((error) => {
 
+        const blob = await new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.onload = function () {
+            resolve(xhr.response);
+          };
+          xhr.onerror = function (e) {
+            console.log(e);
+            reject(new TypeError("Network request failed"));
+          };
+          xhr.responseType = "blob";
+          xhr.open("GET", imgUri, true);
+          xhr.send(null);
+        });
+    
+        const storageRef = storageItem.ref(storage, `images/${auth.currentUser.uid}`);
+        const metadata = {
+          contentType: 'image/jpeg',
+        };
+        await storageItem.uploadBytes(storageRef, blob, metadata)
+        .then(async (snapshot) => {
+          const downloadURL = await storageItem.getDownloadURL(storageRef);
+          await update(ref(db, `users/${auth.currentUser.uid}`), {
+            profile_picture: downloadURL
+          }).then(() => {
+            setImage(downloadURL);
+          })
+          blob.close();
         })
       }
     });
