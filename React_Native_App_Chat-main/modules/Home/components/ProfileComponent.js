@@ -5,7 +5,8 @@ import { ScrollView } from 'react-native';
 import Modal from 'react-native-modal/dist/modal';
 import { Appbar, Avatar, Button, Switch } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { auth, db, storage } from '../../../src/firebase/config';
 import { signOut } from "firebase/auth";
@@ -30,9 +31,9 @@ const ProfileComponent = () => {
     setSwitchButton(!switchButton)
   }
 
-  const SignOutUser = () => {
+  const SignOutUser = async () => {
     const currentUser = auth.currentUser.uid;
-    signOut(auth).then(() => {
+    await signOut(auth).then(() => {
       update(ref(db, `users/${currentUser}`), {
         status: false,
       }).then(() => {
@@ -46,6 +47,8 @@ const ProfileComponent = () => {
   }
 
   const [name, setName] = useState('');
+  const [image, setImage] = useState('');
+  const [addId, setAddId] = useState('');
 
   useEffect(() => {
     get(child(ref(db), `users/${auth.currentUser.uid}`)).then((snapshot) => {
@@ -53,6 +56,7 @@ const ProfileComponent = () => {
         //console.log(snapshot.val());
         setName(snapshot.val().username);
         setImage(snapshot.val().profile_picture);
+        setAddId(snapshot.val().idAdd)
       } else {
         console.log("No data available");
       }
@@ -60,8 +64,6 @@ const ProfileComponent = () => {
       console.error(error);
     });
   }, []);
-
-  const [image, setImage] = useState('');
 
   const updateProfileImg = async () => {
     launchImageLibrary('photo', async (response) => {
@@ -85,21 +87,21 @@ const ProfileComponent = () => {
           xhr.open("GET", imgUri, true);
           xhr.send(null);
         });
-    
+
         const storageRef = storageItem.ref(storage, `images/${auth.currentUser.uid}`);
         const metadata = {
           contentType: 'image/jpeg',
         };
         await storageItem.uploadBytes(storageRef, blob, metadata)
-        .then(async (snapshot) => {
-          const downloadURL = await storageItem.getDownloadURL(storageRef);
-          await update(ref(db, `users/${auth.currentUser.uid}`), {
-            profile_picture: downloadURL
-          }).then(() => {
-            setImage(downloadURL);
+          .then(async (snapshot) => {
+            const downloadURL = await storageItem.getDownloadURL(storageRef);
+            await update(ref(db, `users/${auth.currentUser.uid}`), {
+              profile_picture: downloadURL
+            }).then(() => {
+              setImage(downloadURL);
+            })
+            blob.close();
           })
-          blob.close();
-        })
       }
     });
   }
@@ -127,19 +129,15 @@ const ProfileComponent = () => {
           <View><Text style={{ color: 'black', fontSize: 20 }}>{name}</Text></View>
         </View>
         <View style={styles.viewSet}>
-          {
-            switchButton ?
-              <View style={styles.icon}>
-                <Icon name="user-check" size={30} />
-              </View> :
-              <View style={styles.icon}>
-                <Icon name="user-lock" size={30} />
-              </View>
-          }
-          <View style={styles.textSet}>
-            <Text>Set status</Text>
+          <View style={styles.icon}>
+            <Icon name="key" size={30} />
           </View>
-          <View style={styles.icon}><Switch value={switchButton} onValueChange={toggle} /></View>
+          <View style={styles.textSet}>
+            <Text selectable style={{fontSize: 18}}>{addId}</Text>
+          </View>
+            <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', flex: 2}}onPress={() => Clipboard.setString(addId)}>
+              <Text style={{ color: 'black', borderWidth: 1, padding: 6, fontWeight: 'bold'}}>Copy</Text>
+            </TouchableOpacity>
         </View>
         <View style={styles.viewSet}>
           <View style={styles.icon}>
@@ -205,17 +203,19 @@ const styles = StyleSheet.create({
   viewSet: {
     display: 'flex',
     flexDirection: 'row',
-    borderBottomWidth: 0.35
+    borderBottomWidth: 0.35,
   },
   icon: {
     display: 'flex',
     flex: 1,
-    margin: 15
+    marginHorizontal: 15,
+    alignItems: 'center', 
+    justifyContent: 'center'
   },
   textSet: {
     display: 'flex',
-    flex: 5,
-    margin: 20
+    flex: 6,
+    margin: 20,
   },
   modalContainer: {
     backgroundColor: "#ffffff",

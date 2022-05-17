@@ -1,31 +1,50 @@
 import React, { useState } from 'react'
 import { Text, TextInput } from 'react-native-paper'
 import { Dimensions, StyleSheet, useWindowDimensions, View } from 'react-native';
+import moment from 'moment';
+import 'moment/locale/vi'
+
 const MeChat = () => {
   const [messages, setMessages] = useState([]);
-  const {height} = useWindowDimensions();
-  const windowWidth = Dimensions.get('window').width;
+
+  const isCurrentUser = false;
+  //LT
+  const time = moment();
+  time.locale('vi');
+  const createAt = time.format('LT');
   
   return (
-    <View style={[styles.view,{width : windowWidth*0.7,marginLeft : windowWidth*0.3}]}> 
-      <Text style={styles.text}>me send friend message and user then send message</Text>
+    <View style={[styles.view, isCurrentUser? styles.viewRight : styles.viewLeft]}>
+      <Text style={[styles.text, {color: isCurrentUser ? 'white' : 'black'}]}>ajjjjjajs</Text>
+      <Text style={styles.time}>{createAt}</Text>
     </View>
   )
 }
 
 const styles= StyleSheet.create({
-  view : {
-    margin : 10
+  viewLeft : {
+    margin : 10,
+    padding : 10,
+    borderRadius : 20,
+    maxWidth : '75%',
+    backgroundColor : '#82eb5a',
+    marginRight: 'auto'
+  },
+  viewRight : {
+    margin : 10,
+    padding : 10,
+    borderRadius : 20,
+    maxWidth : '75%',
+    backgroundColor : '#17a2e6',
+    marginLeft: 'auto'
   },
   text : {
-    width : '100%',
-    borderWidth : 1,
     color :'#373b3b',
-    borderColor :'#0ccdff',
     fontSize : 18,
-    borderRadius : 8,
-    backgroundColor : '#24C1E8',
-    padding : 5
+    marginBottom: 5
+  },
+  time : {
+    color: '#585b5d'
   }
 })
 

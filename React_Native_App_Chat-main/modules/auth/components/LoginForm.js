@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import { Card, TextInput,Button } from 'react-native-paper';
+import { TextInput,Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
-import Ionicons from'react-native-vector-icons/Ionicons';
 import { auth } from '../../../src/firebase/config';
-import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const LoginForm = () =>{
 
@@ -13,18 +12,14 @@ const LoginForm = () =>{
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const signInUser=() => {
+  const signInUser = async () => {
     if (email === '' || password === '') {
       alert("Please enter details");
     }
-    signInWithEmailAndPassword(auth, email, password)
+    await signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        const user = userCredential.user;
-        console.log("Login");
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
         if (error.code === "auth/user-not-found") {
           alert("User not found");
         }

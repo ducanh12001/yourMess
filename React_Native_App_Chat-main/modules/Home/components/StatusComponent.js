@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/core';
-import { onValue, ref } from 'firebase/database';
+import { child, get, onValue, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
 import { Searchbar } from 'react-native-paper';
@@ -20,27 +20,26 @@ const StatusComponent = () => {
 
     useEffect(() => {
         const dbRef = ref(db, '/users');
-        const subcriber = onValue(dbRef, (snapshot) => {
-            const uid = auth.currentUser.uid;
-            const users = [];
-            snapshot.forEach((childSnapshot) => {
-                const childKey = childSnapshot.key;
-                const childData = childSnapshot.val();
-                if (childData.uid === uid) {
-
-                } else {
-                    users.push({
-                        username: childData.username,
-                        uid: childData.uid,
-                        profileImage: childData.profile_picture,
-                        status: childData.status
-                    })
-                }
-            });
-            setAllUsers(users);
-            setUserBack(users);
-        }, {
-            onlyOnce: true
+        const subcriber = onValue(child(ref(db), 'users'), (snapshot) => {
+            if (auth.currentUser) {
+                const uid = auth.currentUser.uid;
+                const users = [];
+                snapshot.forEach((childSnapshot) => {
+                    const childData = childSnapshot.val();
+                    if (childData.uid === uid) {
+                        //console.log(uid);
+                    } else {
+                        users.push({
+                            username: childData.username,
+                            uid: childData.uid,
+                            profileImage: childData.profile_picture,
+                            status: childData.status
+                        })
+                    }
+                })
+                setAllUsers(users);
+                setUserBack(users);
+            }
         });
         return subcriber
     }, []);
@@ -54,7 +53,6 @@ const StatusComponent = () => {
                 value={search}
             />
             <FlatList
-                alwaysBounceVertical={false}
                 style={{ padding: 5 }}
                 data={allUsers}
                 keyExtractor={(item, index) => index.toString()}

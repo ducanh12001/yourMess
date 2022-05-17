@@ -1,13 +1,11 @@
 import React from 'react';
-import {StyleSheet, View,Text} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
 import HomeComponent from '../components/HomeComponent';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import ProfileComponent from '../components/ProfileComponent'
 import StatusComponent from '../components/StatusComponent';
-import { useNavigation } from '@react-navigation/core'
-import { TabNavigatorParamsList } from '../../../types';
+import AddFriendComponent from '../components/AddFriendComponent';
 
 
 const Tab= createBottomTabNavigator();
@@ -28,6 +26,13 @@ const BottomNavigationComponent = () =>{
                 component={StatusComponent}
                 options={{
                     tabBarIcon: ({size, color}) => (<Icon name="heartbeat" color={color} size={size} />)
+                }}
+            />
+            <Tab.Screen 
+                name="Add Friend" 
+                component={AddFriendComponent}
+                options={{
+                    tabBarIcon: ({size, color}) => (<Ionicons name="person-add" color={color} size={size} />)
                 }}
             />
             <Tab.Screen 

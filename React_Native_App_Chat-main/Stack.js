@@ -3,7 +3,6 @@ import LoginScreen from './modules/auth/screens/LoginScreen';
 import HomeScreen from './modules/Home/screens/HomeScreens';
 import { createStackNavigator } from '@react-navigation/stack';
 import SignUpScreen from './modules/auth/screens/SingUpScreen';
-
 import ChatScreen from './modules/Chat/screens/ChatScreen';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from './src/firebase/config';
@@ -34,8 +33,9 @@ export const MainStackNavigator = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        const uid = user.uid;
         setUser(user);
-        update(ref(db, `users/${auth.currentUser.uid}`), {
+        update(ref(db, `users/${uid}`), {
           status: true
         }).then(() => {
           console.log("onl");
