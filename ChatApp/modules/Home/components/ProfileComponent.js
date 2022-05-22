@@ -52,7 +52,6 @@ const ProfileComponent = () => {
   useEffect(() => {
     get(child(ref(db), `users/${auth.currentUser.uid}`)).then((snapshot) => {
       if (snapshot.exists()) {
-        //console.log(snapshot.val());
         setName(snapshot.val().username);
         setImage(snapshot.val().profile_picture);
         setAddId(snapshot.val().idAdd)

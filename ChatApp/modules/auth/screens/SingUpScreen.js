@@ -4,7 +4,7 @@ import { Card } from 'react-native-paper';
 import SignUpForm from '../components/SignUpForm';
 
 
-const SignUpScreen = ({ navigation }) => {
+const SignUpScreen = () => {
 
     const { height } = useWindowDimensions();
 

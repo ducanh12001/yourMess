@@ -7,15 +7,12 @@ import { auth, db } from '../../../src/firebase/config';
 import { AddFriend, DeleteFriend } from './FriendFunction';
 
 const AddFriendComponent = () => {
-    const navigation = useNavigation()
 
     const [addFr, setAddFr] = useState(false);
-    const [isFriend, setIsFriend] = useState(true);
     const [allUsers, setAllUsers] = useState([]);
     const [search, setSearch] = useState('');
     const [userBack, setUserBack] = useState([]);
     const [isOnList, setIsOnList] = useState(false);
-    const [currentId, setCurrentId] = useState('');
 
     const searchUser = (val) => {
         if (val === "") {

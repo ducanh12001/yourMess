@@ -19,7 +19,6 @@ const StatusComponent = () => {
     }
 
     useEffect(() => {
-        const dbRef = ref(db, '/users');
         const subcriber = onValue(child(ref(db), 'users'), (snapshot) => {
             if (auth.currentUser) {
                 const uid = auth.currentUser.uid;

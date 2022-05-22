@@ -13,7 +13,6 @@ import EmojiSelector, { Categories } from "react-native-emoji-selector";
 
 const ChatScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { height } = useWindowDimensions();
   const { Username, pImage } = route.params;
   const [mess, setMess] = useState('');
   const [allMess, setAllMess] = useState([]);
@@ -21,7 +20,6 @@ const ChatScreen = ({ route }) => {
   const [fromId, setFromId] = useState('');
   const [emojiIcon, setEmojiIcon] = useState(true);
   const [closeIcon, setCloseIcon] = useState(false);
-  const [emojiShow, setEmojiShow] = useState(false);
   const [inputClick, setInputClick] = useState(false);
 
   useEffect(() => {
@@ -61,8 +59,7 @@ const ChatScreen = ({ route }) => {
         alert(err);
       })
     }
-    setMess('')
-    //console.log(currentId + " to " + FriendId)
+    setMess('');
   }
 
   const openImage = async () => {
