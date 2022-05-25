@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
-import { child, onValue, ref } from 'firebase/database'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { child, onValue, ref, update } from 'firebase/database'
+import React, { useEffect, useState } from 'react'
 import { FlatList, Image, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, useWindowDimensions, View } from 'react-native'
 import { Appbar, Avatar } from 'react-native-paper'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -13,11 +13,14 @@ import EmojiSelector, { Categories } from "react-native-emoji-selector";
 
 const ChatScreen = ({ route }) => {
   const navigation = useNavigation();
+  
   const { Username, pImage } = route.params;
   const [mess, setMess] = useState('');
   const [allMess, setAllMess] = useState([]);
   const { FriendId, friendStatus } = route.params;
   const [fromId, setFromId] = useState('');
+  const [lastMessage, setLastMessage] = useState('')
+
   const [emojiIcon, setEmojiIcon] = useState(true);
   const [closeIcon, setCloseIcon] = useState(false);
   const [inputClick, setInputClick] = useState(false);
@@ -49,12 +52,18 @@ const ChatScreen = ({ route }) => {
     if (mess && specialChars.test(mess)) {
       SendMessage(currentId, FriendId, mess, "").then((res) => {
         setMess('');
+        update(ref(db, `chats/${currentId}/${FriendId}`), {
+          lastMessage: mess
+        })
       }).catch(err => {
         alert(err);
       })
 
       RecieveMessage(currentId, FriendId, mess, "").then((res) => {
         setMess('');
+        update(ref(db, `chats/${FriendId}/${currentId}`), {
+          lastMessage: mess
+        })
       }).catch(err => {
         alert(err);
       })
@@ -63,14 +72,14 @@ const ChatScreen = ({ route }) => {
   }
 
   const openImage = async () => {
-    launchImageLibrary('mixed', async (response) => {
+    launchImageLibrary('photo', async (response) => {
       if (response.didCancel) {
         console.log("cancel img");
       } else if (response.errorCode == 'permission') {
         console.log("permission denied");
       } else {
         const imgUri = response.assets[0].uri;
-        console.log(response)
+        
         const blob = await new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.onload = function () {
@@ -119,8 +128,6 @@ const ChatScreen = ({ route }) => {
     setCloseIcon(false);
     setInputClick(false);
   }
-
-  
 
   return (
     <View style={styles.container}>
@@ -193,7 +200,6 @@ const ChatScreen = ({ route }) => {
         <View></View>
       }
     </View>
-
   )
 }
 

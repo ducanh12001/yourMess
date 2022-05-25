@@ -3,31 +3,32 @@ import { child, onValue, push, ref, remove } from 'firebase/database';
 import React, { useEffect, useState } from 'react'
 import { Button, FlatList, Image, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import { Searchbar} from 'react-native-paper'
-import { auth, db } from '../../../src/firebase/config';
-import { AddFriend, DeleteFriend } from './FriendFunction';
+import { auth, db } from '../../../../src/firebase/config';
+import { SendRequest, RecieveRequest } from '../Friend/FriendFunction'
 
 const AddFriendComponent = () => {
 
     const [addFr, setAddFr] = useState(false);
+    const [isFriend, setIsFriend] = useState(true);
     const [allUsers, setAllUsers] = useState([]);
     const [search, setSearch] = useState('');
     const [userBack, setUserBack] = useState([]);
-    const [isOnList, setIsOnList] = useState(false);
+    const [isExist, setIsExist] = useState(false);
+    const [currentId, setCurrentId] = useState('');
 
     const searchUser = (val) => {
         if (val === "") {
             setIsOnList(false);
             setSearch(val);
         } else {
-            setIsOnList(true);
+            setIsExist(true);
             setSearch(val);
-            setAllUsers(userBack.filter((item) => item.idAdd.toLowerCase().match(val.toLowerCase())));
+            setAllUsers(userBack.filter((item) => item.idAdd === val));
         }
     }
 
     useEffect(() => {
         const currentId = auth.currentUser.uid;
-        const dbRef = ref(db, '/users');
         const subcriber = onValue(child(ref(db), 'users'), (snapshot) => {
                 const users = [];
                 snapshot.forEach((childSnapshot) => {
@@ -69,7 +70,7 @@ const AddFriendComponent = () => {
                         onChangeText={val => searchUser(val)}
                         value={search}
                     />
-                    {isOnList ?
+                    {isExist ?
                         <FlatList
                             alwaysBounceVertical={false}
                             style={{ padding: 5 }}

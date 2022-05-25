@@ -4,7 +4,6 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Appbar, Avatar, Searchbar } from 'react-native-paper';
 
 const HomeComponent = () =>{
-    const navigation = useNavigation();
 
     const [search,setSearch] = React.useState('');
 

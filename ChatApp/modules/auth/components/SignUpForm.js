@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, Text, useWindowDimensions, View, KeyboardAvoidingView } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../../../src/firebase/config';
@@ -33,6 +33,7 @@ const SignUpForm = () => {
       idAdd: uuidv4().slice(0, 8),
       friendList: [],
       friendRequest: [],
+      userRequest: [],
     });
   }
 
@@ -58,9 +59,9 @@ const SignUpForm = () => {
   }
 
   return (
-    <View>
-      <View style={styles.viewInput}>
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <TextInput
+        style={styles.viewInput}
           label="Email"
           mode="flat"
           value={email}
@@ -68,9 +69,8 @@ const SignUpForm = () => {
           placeholder="mời bạn nhập email"
           onChangeText={text => setEmail(text)}
         />
-      </View>
-      <View style={styles.viewInput}>
         <TextInput
+        style={styles.viewInput}
           label="Password"
           mode="flat"
           value={password}
@@ -78,16 +78,14 @@ const SignUpForm = () => {
           theme={{ roundness: 0 }}
           onChangeText={text => setPassword(text)}
         />
-      </View>
-      <View style={styles.viewInput}>
         <TextInput
+        style={styles.viewInput}
           label="Nick name"
           mode="flat"
           value={name}
           theme={{ roundness: 0 }}
           onChangeText={text => setName(text)}
         />
-      </View>
 
       <Button mode="contained"
         icon="pencil"
@@ -101,11 +99,14 @@ const SignUpForm = () => {
       }} style={[styles.textOr, { marginLeft: width * 0.2, color: 'green' }]}>
         If you have account, to login
       </Text>
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   cusButton: {
     marginBottom: 15
   },

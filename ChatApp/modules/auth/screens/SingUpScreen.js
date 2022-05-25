@@ -3,9 +3,7 @@ import { Image, StyleSheet, Text, useWindowDimensions, View } from 'react-native
 import { Card } from 'react-native-paper';
 import SignUpForm from '../components/SignUpForm';
 
-
 const SignUpScreen = () => {
-
     const { height } = useWindowDimensions();
 
     return (

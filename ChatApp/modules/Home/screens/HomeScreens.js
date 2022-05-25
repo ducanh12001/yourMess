@@ -5,11 +5,11 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import ProfileComponent from '../components/ProfileComponent'
 import StatusComponent from '../components/StatusComponent';
-import AddFriendComponent from '../components/AddFriendComponent';
+import FriendComponent from '../components/FriendComponent';
 
-const Tab= createBottomTabNavigator();
+const Tab = createBottomTabNavigator();
 
-const BottomNavigationComponent = () =>{
+const HomeScreens = () =>{
 
     return (
         <Tab.Navigator screenOptions={{ headerShown: false }}>
@@ -29,7 +29,7 @@ const BottomNavigationComponent = () =>{
             />
             <Tab.Screen 
                 name="Add Friend" 
-                component={AddFriendComponent}
+                component={FriendComponent}
                 options={{
                     tabBarIcon: ({size, color}) => (<Ionicons name="person-add" color={color} size={size} />)
                 }}
@@ -45,4 +45,4 @@ const BottomNavigationComponent = () =>{
     )
 }
 
-export default BottomNavigationComponent
+export default HomeScreens
