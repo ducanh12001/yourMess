@@ -4,7 +4,6 @@ import { Card } from 'react-native-paper';
 import LoginForm from '../components/LoginForm';
 
 const LoginScreen = () => {
-
     const { height } = useWindowDimensions();
 
     return (

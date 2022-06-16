@@ -1,7 +1,7 @@
 import { child, onValue, ref } from 'firebase/database'
 import React, { useEffect, useState } from 'react'
 import { Button, FlatList, Image, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
-import { auth, db } from '../../../../src/firebase/config'
+import { auth, db } from '../../../../src/config/firebase'
 
 const SendRecieve = () => {
 

@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { Avatar } from 'react-native-paper'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import { auth, db, storage } from '../../../src/firebase/config'
 
 const ReceiveCall = () => {
     const navigation = useNavigation();

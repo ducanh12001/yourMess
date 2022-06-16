@@ -5,7 +5,7 @@ import { FlatList, Image, Keyboard, KeyboardAvoidingView, StyleSheet, Text, Text
 import { Appbar, Avatar } from 'react-native-paper'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Entypo from 'react-native-vector-icons/Entypo'
-import { auth, db, storage } from '../../../src/firebase/config'
+import { auth, db, storage } from '../../../src/config/firebase'
 import { SendMessage, RecieveMessage } from '../components/Mess'
 import { launchImageLibrary } from 'react-native-image-picker';
 import * as storageItem from "firebase/storage";
@@ -76,9 +76,6 @@ const ChatScreen = ({ route }) => {
     const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~a-zA-Z0-9]/;
     if (mess && specialChars.test(mess)) {
       SendMessage(currentId, FriendId, mess, "").then((res) => {
-        update(ref(db, `chats/${currentId}/${FriendId}`), {
-          lastMessage: mess
-        })
         setMess('');
       }).catch(err => {
         alert(err);
@@ -86,14 +83,11 @@ const ChatScreen = ({ route }) => {
 
       RecieveMessage(currentId, FriendId, mess, "").then((res) => {
         setMess('');
-        update(ref(db, `chats/${FriendId}/${currentId}`), {
-          lastMessage: mess
-        })
-        PushNotification.localNotification({
+        /*PushNotification.localNotification({
           channelId: "channel-id", 
           title: name,
           message: mess
-        })
+        })*/
       }).catch(err => {
         alert(err);
       })
@@ -132,17 +126,11 @@ const ChatScreen = ({ route }) => {
           .then(async (snapshot) => {
             const downloadURL = await storageItem.getDownloadURL(storageRef);
             SendMessage(fromId, FriendId, "", downloadURL).then((res) => {
-              update(ref(db, `chats/${fromId}/${FriendId}`), {
-                lastMessage: "da gui anh"
-              })
             }).catch(err => {
               alert(err);
             })
 
             RecieveMessage(fromId, FriendId, "", downloadURL).then((res) => {
-              update(ref(db, `chats/${FriendId}/${fromId}`), {
-                lastMessage: "da nhan anh"
-              })
             }).catch(err => {
               alert(err);
             })

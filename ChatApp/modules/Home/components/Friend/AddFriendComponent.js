@@ -3,7 +3,7 @@ import { child, onValue, push, ref, remove } from 'firebase/database';
 import React, { useEffect, useState } from 'react'
 import { Button, FlatList, Image, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import { Searchbar } from 'react-native-paper'
-import { auth, db } from '../../../../src/firebase/config';
+import { auth, db } from '../../../../src/config/firebase';
 
 const AddFriendComponent = () => {
 

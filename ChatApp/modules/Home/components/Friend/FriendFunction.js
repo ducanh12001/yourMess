@@ -1,5 +1,5 @@
 import { child, push, ref, remove } from "firebase/database";
-import { db } from "../../../../src/firebase/config";
+import { db } from "../../../../src/config/firebase";
 
 export const SendRequest = async (currentId ,friendId) => {
     try {

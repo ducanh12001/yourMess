@@ -4,8 +4,6 @@ import { StyleSheet, Text, TextInput, View } from 'react-native'
 import { Avatar } from 'react-native-paper'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { auth, db, storage } from '../../../src/firebase/config'
-import { MediaStream, RTCView, mediaDevices } from 'react-native-webrtc'
 
 const VideoScreen = () => {
     const navigation = useNavigation();

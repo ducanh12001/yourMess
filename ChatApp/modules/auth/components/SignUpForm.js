@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View, KeyboardAvoidingView } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { auth, db } from '../../../src/firebase/config';
+import { auth, db } from '../../../src/config/firebase';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { ref, set } from 'firebase/database';
 import moment from 'moment';

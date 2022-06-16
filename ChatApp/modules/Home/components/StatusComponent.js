@@ -2,9 +2,10 @@ import { useNavigation } from '@react-navigation/core';
 import { child, get, onValue, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
+import Spinner from 'react-native-loading-spinner-overlay';
 import { Searchbar } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { auth, db } from '../../../src/firebase/config';
+import { auth, db } from '../../../src/config/firebase';
 
 const StatusComponent = () => {
     const navigation = useNavigation()
@@ -12,6 +13,7 @@ const StatusComponent = () => {
     const [allUsers, setAllUsers] = useState([]);
     const [search, setSearch] = useState('');
     const [userBack, setUserBack] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const searchUser = (val) => {
         setSearch(val);
@@ -19,6 +21,7 @@ const StatusComponent = () => {
     }
 
     useEffect(() => {
+        setLoading(true);
         const subcriber = onValue(child(ref(db), 'users'), (snapshot) => {
             if (auth.currentUser) {
                 const uid = auth.currentUser.uid;
@@ -26,7 +29,7 @@ const StatusComponent = () => {
                 snapshot.forEach((childSnapshot) => {
                     const childData = childSnapshot.val();
                     if (childData.uid === uid) {
-                        //console.log(uid);
+                        //console.log(childData.uid);
                     } else {
                         users.push({
                             username: childData.username,
@@ -76,11 +79,15 @@ const StatusComponent = () => {
                                         }
                                     </View>
                                 </TouchableOpacity>
-
                             }
                         </>
                     )
                 }}
+            />
+            <Spinner
+                visible={loading}
+                textContent={'Loading...'}
+                textStyle={styles.spinnerTextStyle}
             />
         </View>
     )

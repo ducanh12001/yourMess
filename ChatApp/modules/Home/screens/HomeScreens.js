@@ -12,7 +12,7 @@ const Tab = createBottomTabNavigator();
 const HomeScreens = () =>{
 
     return (
-        <Tab.Navigator screenOptions={{ headerShown: false }}>
+        <Tab.Navigator initialRouteName="User" screenOptions={{ headerShown: false }}>
             <Tab.Screen
                 name="Home"
                 component={HomeComponent}

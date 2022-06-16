@@ -4,7 +4,6 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 import { Avatar } from 'react-native-paper'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { auth, db, storage } from '../../../src/firebase/config'
 import {
 	ScreenCapturePickerView,
 	RTCPeerConnection,

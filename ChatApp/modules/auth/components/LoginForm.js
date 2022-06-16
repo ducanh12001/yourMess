@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { TextInput,Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
-import { auth } from '../../../src/firebase/config';
+import { auth } from '../../../src/config/firebase';
 import { signInWithEmailAndPassword } from "firebase/auth";
+import AppLoader from '../../AppLoader';
 
 const LoginForm = () =>{
-
   const navigation = useNavigation();
 
   const [email, setEmail] = useState('');
@@ -31,7 +31,6 @@ const LoginForm = () =>{
       });
   }
 
-  const {height} = useWindowDimensions();
     return (
       <View>
         <View style={styles.viewInput}>

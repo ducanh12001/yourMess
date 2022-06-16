@@ -7,7 +7,7 @@ import { Appbar, Avatar, Button, Switch } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { auth, db, storage } from '../../../src/firebase/config';
+import { auth, db, storage } from '../../../src/config/firebase';
 import { signOut } from "firebase/auth";
 import { child, get, ref, update } from 'firebase/database';
 import * as storageItem from "firebase/storage";
@@ -107,7 +107,6 @@ const ProfileComponent = () => {
   return (
     <View style={styles.container}>
       <Appbar.Header style={styles.Appbar}>
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content title="Profile" />
       </Appbar.Header>
       <ScrollView style={{ height: '100%' }}>
@@ -137,7 +136,7 @@ const ProfileComponent = () => {
               <Text style={{ color: 'black', borderWidth: 1, padding: 6, fontWeight: 'bold'}}>Copy</Text>
             </TouchableOpacity>
         </View>
-        <View style={styles.viewSet}>
+        <TouchableOpacity style={styles.viewSet} onPress={() => navigation.navigate('NewPass')}>
           <View style={styles.icon}>
             <Icon name="hammer" size={30} />
           </View>
@@ -145,7 +144,7 @@ const ProfileComponent = () => {
             <Text>Change password</Text>
           </View>
           <View style={styles.icon}></View>
-        </View>
+        </TouchableOpacity>
         <View style={styles.viewSet}>
           {notification ?
             <View style={styles.icon}>

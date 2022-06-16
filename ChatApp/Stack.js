@@ -5,9 +5,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignUpScreen from './modules/auth/screens/SingUpScreen';
 import ChatScreen from './modules/Chat/screens/ChatScreen';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth, db } from './src/firebase/config';
+import { auth, db } from './src/config/firebase';
 import { ref, update } from 'firebase/database';
 import CallComponent from './modules/Chat/components/CallComponent';
+import NewPass from './modules/Home/components/NewPass';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,7 @@ function AppStack() {
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
       <Stack.Screen name="CallComponent" component={CallComponent} />
+      <Stack.Screen name="NewPass" component={NewPass} />
     </Stack.Navigator>
   )
 }
