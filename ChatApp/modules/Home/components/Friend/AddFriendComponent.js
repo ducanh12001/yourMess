@@ -2,9 +2,8 @@ import { useNavigation } from '@react-navigation/native';
 import { child, onValue, push, ref, remove } from 'firebase/database';
 import React, { useEffect, useState } from 'react'
 import { Button, FlatList, Image, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
-import { Searchbar} from 'react-native-paper'
+import { Searchbar } from 'react-native-paper'
 import { auth, db } from '../../../../src/firebase/config';
-import { SendRequest, RecieveRequest } from '../Friend/FriendFunction'
 
 const AddFriendComponent = () => {
 
@@ -18,42 +17,43 @@ const AddFriendComponent = () => {
 
     const searchUser = (val) => {
         if (val === "") {
-            setIsOnList(false);
+            setIsExist(false);
             setSearch(val);
         } else {
-            setIsExist(true);
             setSearch(val);
-            setAllUsers(userBack.filter((item) => item.idAdd === val));
+            setAllUsers(userBack.filter((item) => item.idAdd === val ));
+            setIsExist(true);
         }
     }
 
     useEffect(() => {
         const currentId = auth.currentUser.uid;
         const subcriber = onValue(child(ref(db), 'users'), (snapshot) => {
-                const users = [];
-                snapshot.forEach((childSnapshot) => {
-                    const childData = childSnapshot.val();
-                    if (childData.uid === currentId) {
-                        //console.log(uid);
-                    } else {
-                        users.push({
-                            username: childData.username,
-                            profileImage: childData.profile_picture,
-                            idAdd: childData.idAdd,
-                        })
-                    }
-                })
-                setAllUsers(users);
-                setUserBack(users);
+            const users = [];
+            snapshot.forEach((childSnapshot) => {
+                const childData = childSnapshot.val();
+                if (childData.uid === currentId) {
+                    //console.log(uid);
+                } else {
+                    users.push({
+                        username: childData.username,
+                        profileImage: childData.profile_picture,
+                        idAdd: childData.idAdd,
+                    })
+                }
+            })
+            setAllUsers(users);
+            setUserBack(users);
         });
         return subcriber
     }, []);
 
-    const addFriend = async (friendId) => {
+    const addFriend = (friendId) => {
         setAddFr(true);
+
     }
 
-    const deleteFriend = async (friendId) => {
+    const deleteFriend = (friendId) => {
         setAddFr(false);
     }
 
@@ -95,7 +95,7 @@ const AddFriendComponent = () => {
                                 )
                             }}
                         /> :
-                        <View style={{flex: 1}} />
+                        <View style={{ flex: 1 }} />
                     }
                 </View>
             </TouchableWithoutFeedback>

@@ -9,14 +9,14 @@ export const SendMessage = async (currentId, friendId, message, imgUrl) => {
     const createTime = time.format('LT');
     const createDate = time.format('L');
     try {
-        return await push(child(ref(db, 'chats/' + currentId), friendId), {
+        return await push(child(ref(db, 'chats/' + currentId), friendId + "/messages"), {
             fromId: currentId,
             toId: friendId,
             message: message,
             image: imgUrl,
             createTime: createTime,
             createDate: createDate
-        });
+        })
     } catch (err) {
         alert(err);
     }
@@ -28,14 +28,14 @@ export const RecieveMessage = async (currentId, friendId, message, imgUrl) => {
     const createTime = time.format('LT');
     const createDate = time.format('L');
     try {
-        return await push(child(ref(db, 'chats/' + friendId), currentId), {
+        return await push(child(ref(db, 'chats/' + friendId), currentId + "/messages"), {
             fromId: currentId,
             toId: friendId,
             message: message,
             image: imgUrl,
             createTime: createTime,
             createDate: createDate
-        });
+        })
     } catch (err) {
         alert(err);
     }

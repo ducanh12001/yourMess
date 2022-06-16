@@ -1,15 +1,17 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getDatabase } from "firebase/database";
+import { getAuth, connectAuthEmulator } from "firebase/auth";
+import { getDatabase, connectDatabaseEmulator } from "firebase/database";
 import { getStorage } from "firebase/storage";
+import { getMessaging, getToken } from "firebase/messaging";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDaj-vupg43NgRNXviq0ecBJNHjdUnAExg",
-    authDomain: "yourmess-b3b58.firebaseapp.com",
-    projectId: "yourmess-b3b58",
-    storageBucket: "yourmess-b3b58.appspot.com",
-    messagingSenderId: "716363994082",
-    appId: "1:716363994082:web:658cd5270f321ee21adfbb"
+    apiKey: "AIzaSyAS_3Vt7nrSI5bXZkcKckfowBuQ8nFtrxE",
+    authDomain: "chatapp-1d941.firebaseapp.com",
+    databaseURL: "https://chatapp-1d941-default-rtdb.firebaseio.com",
+    projectId: "chatapp-1d941",
+    storageBucket: "chatapp-1d941.appspot.com",
+    messagingSenderId: "1054390515994",
+    appId: "1:1054390515994:web:6a05ec03d77be8ecee14a3"
 };
 
 let app;
@@ -20,7 +22,12 @@ if (getApps.length === 0) {
 }
 const auth = getAuth(app);
 const db = getDatabase(app);
+/*if (location.hostname === "localhost") {
+    connectDatabaseEmulator(db, "localhost", 9000);
+    connectAuthEmulator(auth, "http://localhost:9099");
+}*/
 const storage = getStorage(app);
 
+//const messaging = getMessaging(app);
+
 export { auth, db, storage }
-  

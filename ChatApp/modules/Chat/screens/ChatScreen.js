@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { child, onValue, ref, update } from 'firebase/database'
+import { child, get, onValue, ref, update } from 'firebase/database'
 import React, { useEffect, useState } from 'react'
 import { FlatList, Image, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, useWindowDimensions, View } from 'react-native'
 import { Appbar, Avatar } from 'react-native-paper'
@@ -10,6 +10,7 @@ import { SendMessage, RecieveMessage } from '../components/Mess'
 import { launchImageLibrary } from 'react-native-image-picker';
 import * as storageItem from "firebase/storage";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
+import PushNotification from "react-native-push-notification";
 
 const ChatScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -17,18 +18,29 @@ const ChatScreen = ({ route }) => {
   const { Username, pImage } = route.params;
   const [mess, setMess] = useState('');
   const [allMess, setAllMess] = useState([]);
-  const { FriendId, friendStatus } = route.params;
+  const { FriendId, friendStatus, mainname } = route.params;
   const [fromId, setFromId] = useState('');
   const [lastMessage, setLastMessage] = useState('')
+  const [name, setName] = useState('')
 
   const [emojiIcon, setEmojiIcon] = useState(true);
   const [closeIcon, setCloseIcon] = useState(false);
   const [inputClick, setInputClick] = useState(false);
 
   useEffect(() => {
+    createChannel();
     const currentId = auth.currentUser.uid;
     setFromId(currentId);
-    const dbRef = child(child(ref(db, 'chats'), currentId), FriendId);
+    get(child(ref(db), `users/${fromId}`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        setName(snapshot.val().username);
+      } else {
+        console.log("No data available");
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+    const dbRef = child(child(ref(db, 'chats'), currentId), FriendId + "/messages");
     const chat = onValue(dbRef, (snapshot) => {
       const messList = [];
       snapshot.forEach((childSnapshot) => {
@@ -46,15 +58,28 @@ const ChatScreen = ({ route }) => {
     return chat
   }, []);
 
+  const createChannel = () => {
+    PushNotification.createChannel(
+      {
+        channelId: "channel-id", 
+        channelName: "My channel", 
+        channelDescription: "A channel to categorise your notifications", 
+        playSound: false, // (optional) default: true
+        soundName: "default", 
+        vibrate: true,
+      }
+    );
+  }
+
   const sendMess = () => {
     const currentId = auth.currentUser.uid;
     const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~a-zA-Z0-9]/;
     if (mess && specialChars.test(mess)) {
       SendMessage(currentId, FriendId, mess, "").then((res) => {
-        setMess('');
         update(ref(db, `chats/${currentId}/${FriendId}`), {
           lastMessage: mess
         })
+        setMess('');
       }).catch(err => {
         alert(err);
       })
@@ -63,6 +88,11 @@ const ChatScreen = ({ route }) => {
         setMess('');
         update(ref(db, `chats/${FriendId}/${currentId}`), {
           lastMessage: mess
+        })
+        PushNotification.localNotification({
+          channelId: "channel-id", 
+          title: name,
+          message: mess
         })
       }).catch(err => {
         alert(err);
@@ -102,11 +132,17 @@ const ChatScreen = ({ route }) => {
           .then(async (snapshot) => {
             const downloadURL = await storageItem.getDownloadURL(storageRef);
             SendMessage(fromId, FriendId, "", downloadURL).then((res) => {
+              update(ref(db, `chats/${fromId}/${FriendId}`), {
+                lastMessage: "da gui anh"
+              })
             }).catch(err => {
               alert(err);
             })
 
             RecieveMessage(fromId, FriendId, "", downloadURL).then((res) => {
+              update(ref(db, `chats/${FriendId}/${fromId}`), {
+                lastMessage: "da nhan anh"
+              })
             }).catch(err => {
               alert(err);
             })
@@ -139,7 +175,7 @@ const ChatScreen = ({ route }) => {
           :
           <Appbar.Content title={Username} subtitle="Offline" />
         }
-        <Appbar.Action icon="phone" color="#2694de" size={28} />
+        <Appbar.Action icon="phone" color="#2694de" size={28} onPress={() => navigation.navigate('CallComponent')}/>
         <Appbar.Action icon="video" color="#2694de" size={28} />
       </Appbar>
       <FlatList

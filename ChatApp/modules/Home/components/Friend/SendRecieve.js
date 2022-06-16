@@ -1,10 +1,7 @@
-import { useNavigation } from '@react-navigation/native';
-import { child, onValue, ref} from 'firebase/database';
+import { child, onValue, ref } from 'firebase/database'
 import React, { useEffect, useState } from 'react'
 import { Button, FlatList, Image, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
-import { Searchbar } from 'react-native-paper'
-import { auth, db } from '../../../../src/firebase/config';
-import { AcceptRequest, DenyRequest } from '../Friend/FriendFunction'
+import { auth, db } from '../../../../src/firebase/config'
 
 const SendRecieve = () => {
 
@@ -13,6 +10,29 @@ const SendRecieve = () => {
     const AcceptRequest = () => {
         console.log("accept")
     }
+
+    const DenieRequest = () => {
+        console.log("denie")
+    }
+
+    useEffect(() => {
+        const currentId = auth.currentUser.uid;
+        const subcriber = onValue(child(ref(db), `users/${currentId}/friendRequest`), (snapshot) => {
+                const requests = [];
+                snapshot.forEach((childSnapshot) => {
+                    const childData = childSnapshot.val();
+                    if (childData.uid === currentId) {
+                        //console.log(uid);
+                    } else {
+                        requests.push({
+                            
+                        })
+                    }
+                })
+                setAllRequest(requests);
+        });
+        return subcriber
+    }, []);
 
     return (
         <KeyboardAvoidingView
@@ -37,6 +57,9 @@ const SendRecieve = () => {
                                     </View>
                                     <View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
                                         <Button title="Chap nhan" onPress={AcceptRequest} />
+                                    </View>
+                                    <View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
+                                        <Button title="Tu choi" onPress={DenieRequest} />
                                     </View>
                                 </View>
                             )

@@ -4,7 +4,7 @@ import { db } from "../../../../src/firebase/config";
 export const SendRequest = async (currentId ,friendId) => {
     try {
         return await push(child(ref(db, 'users/' + currentId), 'userRequest'), {
-            friendId: friendId,
+            toId: friendId,
             isAccept: false,
         })
     }catch (err) {
@@ -15,7 +15,7 @@ export const SendRequest = async (currentId ,friendId) => {
 export const RecieveRequest = async (currentId ,friendId) => {
     try {
         return await push(child(ref(db, 'users/' + friendId), 'friendRequest'), {
-            friendId: friendId,
+            fromId: friendId,
             isAccept: false,
         })
     }catch (err) {

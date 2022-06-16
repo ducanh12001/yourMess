@@ -82,7 +82,6 @@ const StatusComponent = () => {
                     )
                 }}
             />
-
         </View>
     )
 }

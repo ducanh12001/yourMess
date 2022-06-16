@@ -7,6 +7,7 @@ import ChatScreen from './modules/Chat/screens/ChatScreen';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from './src/firebase/config';
 import { ref, update } from 'firebase/database';
+import CallComponent from './modules/Chat/components/CallComponent';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +16,7 @@ function AppStack() {
     <Stack.Navigator initialRouteName="HomeScreen" screenOptions={{ headerShown: false }} >
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
+      <Stack.Screen name="CallComponent" component={CallComponent} />
     </Stack.Navigator>
   )
 }
@@ -30,6 +32,7 @@ function AuthStack() {
 
 export const MainStackNavigator = () => {
   const [user, setUser] = useState(null);
+  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {

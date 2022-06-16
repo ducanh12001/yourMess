@@ -11,6 +11,7 @@ import { auth, db, storage } from '../../../src/firebase/config';
 import { signOut } from "firebase/auth";
 import { child, get, ref, update } from 'firebase/database';
 import * as storageItem from "firebase/storage";
+import Clipboard from '@react-native-community/clipboard';
 
 const ProfileComponent = () => {
   const navigation = useNavigation();
@@ -19,6 +20,9 @@ const ProfileComponent = () => {
   const [switchButton, setSwitchButton] = useState(true);
   const [notification, setNotification] = useState(true);
   const [visibleModal, setVisibleModal] = useState(false);
+  const [name, setName] = useState('');
+  const [image, setImage] = useState('');
+  const [addId, setAddId] = useState('');
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
@@ -45,10 +49,6 @@ const ProfileComponent = () => {
     });
   }
 
-  const [name, setName] = useState('');
-  const [image, setImage] = useState('');
-  const [addId, setAddId] = useState('');
-
   useEffect(() => {
     get(child(ref(db), `users/${auth.currentUser.uid}`)).then((snapshot) => {
       if (snapshot.exists()) {
@@ -64,7 +64,7 @@ const ProfileComponent = () => {
   }, []);
 
   const updateProfileImg = async () => {
-    launchImageLibrary('photo', async (response) => {
+    launchImageLibrary('mix', async (response) => {
       if (response.didCancel) {
         console.log("cancel img");
       } else if (response.errorCode == 'permission') {
@@ -133,7 +133,7 @@ const ProfileComponent = () => {
           <View style={styles.textSet}>
             <Text selectable style={{fontSize: 18}}>{addId}</Text>
           </View>
-            <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', flex: 2}}onPress={() => Clipboard.setString(addId)}>
+            <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', flex: 2}} onPress={() => Clipboard.setString(addId)}>
               <Text style={{ color: 'black', borderWidth: 1, padding: 6, fontWeight: 'bold'}}>Copy</Text>
             </TouchableOpacity>
         </View>
