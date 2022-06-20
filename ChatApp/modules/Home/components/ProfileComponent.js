@@ -11,7 +11,7 @@ import { auth, db, storage } from '../../../src/config/firebase';
 import { signOut } from "firebase/auth";
 import { child, get, ref, update } from 'firebase/database';
 import * as storageItem from "firebase/storage";
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 const ProfileComponent = () => {
   const navigation = useNavigation();

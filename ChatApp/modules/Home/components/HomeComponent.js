@@ -1,12 +1,10 @@
 import { useNavigation } from '@react-navigation/native';
-import { child, onValue, ref } from 'firebase/database';
+import { child, get, onValue, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image } from 'react-native';
 import { Appbar, Avatar, Searchbar } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth, db } from '../../../src/config/firebase';
-import moment from 'moment';
-import 'moment/locale/vi'
 import Spinner from 'react-native-loading-spinner-overlay';
 
 const HomeComponent = () => {
@@ -24,20 +22,24 @@ const HomeComponent = () => {
 
     useEffect(() => {
         setLoading(true);
-        const time = moment();
-        time.locale('vi');
-        const createTime = time.format('LLLL');
-        const createDate = time.format('L');
         const uid = auth.currentUser.uid;
         const subcriber = onValue(child(ref(db), 'chats/' + uid), (snapshot) => {
             const users = [];
             snapshot.forEach((childSnapshot) => {
-                //const childData = childSnapshot.val();
                 const childKey = childSnapshot.key;
                 const lastMess = childSnapshot.val().lastMessage;
-                const messTime = childSnapshot.val().createTime;
                 const ts = childSnapshot.val().ts;
-                //console.log(moment(createTime.date).format('LLLL'))
+                //const messTime = moment((parseFloat(ts) - 12224)).fromNow();
+                const createDate = childSnapshot.val().createDate;
+                var createTime = '';
+                const c1 = new Date(ts);
+                const c2 = new Date();
+                if (c1.getDate() === c2.getDate()) {
+                    createTime = childSnapshot.val().createTime;
+                } else {
+                    createTime = createDate;
+                }
+                //Date.now() = timestamp
                 onValue(child(ref(db), 'users/' + childKey), (snapshot) => {
                     const childData = snapshot.val();
                     users.push({
@@ -46,10 +48,29 @@ const HomeComponent = () => {
                         profileImage: childData.profile_picture,
                         status: childData.status,
                         lastMessage: lastMess,
-                        messTime: messTime,
+                        messTime: createTime,
                         ts: ts
                     })
                 });
+                /*get(child(ref(db), 'users/' + childKey)).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const childData = snapshot.val();
+                        users.push({
+                            username: childData.username,
+                            uid: childData.uid,
+                            profileImage: childData.profile_picture,
+                            status: childData.status,
+                            lastMessage: lastMess,
+                            messTime: createTime,
+                            ts: ts
+                        })
+                        users.sort((a, b) => b.ts - a.ts);
+                        setAllFriendChats(users);
+                        setUserBack(users);
+                    } else {
+                        console.log("No data available");
+                    }
+                })*/
             })
             users.sort((a, b) => b.ts - a.ts);
             setAllFriendChats(users);
@@ -78,7 +99,7 @@ const HomeComponent = () => {
                 renderItem={({ item }) => {
                     return (
                         <>
-                            {item.uid === undefined ?
+                            {item.uid === undefined?
                                 <View></View>
                                 :
                                 <TouchableOpacity onPress={() => navigation.navigate('ChatScreen', { Username: item.username, pImage: item.profileImage, FriendId: item.uid, friendStatus: item.status })} style={{ flexDirection: 'row', borderBottomColor: 'gray', borderBottomWidth: 0.5, padding: 5 }}>

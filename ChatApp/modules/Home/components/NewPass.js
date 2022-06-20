@@ -1,6 +1,6 @@
-import { StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, useWindowDimensions, View } from 'react-native';
 import React, { useState } from 'react'
-import { Button, TextInput } from 'react-native-paper';
+import { Button, TextInput, Appbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../../../src/config/firebase';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
@@ -19,7 +19,7 @@ const NewPass = () => {
         if (currentPass === '' || newPass1 === '' || newPass2 === '') {
             alert("Please enter details");
         } else if (newPass2 != newPass1) {
-            alert('Passwords do not match')
+            alert('Passwords không khớp')
         } else {
             const user = auth.currentUser;
             const credential = EmailAuthProvider.credential(user.email, currentPass);
@@ -41,40 +41,49 @@ const NewPass = () => {
     }
 
     return (
-        <View style={styles.container}>
-            <Text>Đặt lại mật khẩu</Text>
-            <TextInput
-                style={styles.viewInput}
-                label="Mật khẩu hiện tại"
-                mode="flat"
-                value={currentPassword}
-                secureTextEntry
-                onChangeText={text => setCurrentPassword(text)}>
-            </TextInput>
-            <TextInput
-                style={styles.viewInput}
-                label="Mật khẩu mới"
-                mode="flat"
-                value={newPassword1}
-                secureTextEntry
-                placeholder='do dai 6'
-                onChangeText={text => setNewPassword1(text)}>
-            </TextInput>
-            <TextInput
-                style={styles.viewInput}
-                label="Lặp lại mật khẩu mới"
-                mode="flat"
-                value={newPassword2}
-                secureTextEntry
-                onChangeText={text => setNewPassword2(text)}>
-            </TextInput>
-            <Button mode="contained"
-                style={[styles.cusButton]}
-                theme={{ roundness: 0 }}
-                onPress={() => resetPassword(currentPassword, newPassword1, newPassword2)}
-            >Xác nhận
-            </Button>
-        </View>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View style={styles.bodyContainer}>
+                    <Appbar.Header style={styles.Appbar}>
+                        <Appbar.BackAction onPress={() => navigation.goBack()} />
+                        <Appbar.Content title="Đặt lại mật khẩu" />
+                    </Appbar.Header>
+                    <View style={styles.body}>
+                        <TextInput
+                            style={styles.viewInput}
+                            label="Mật khẩu hiện tại"
+                            mode="flat"
+                            value={currentPassword}
+                            secureTextEntry
+                            onChangeText={text => setCurrentPassword(text)}>
+                        </TextInput>
+                        <TextInput
+                            style={styles.viewInput}
+                            label="Mật khẩu mới"
+                            mode="flat"
+                            value={newPassword1}
+                            secureTextEntry
+                            placeholder='Ít nhất 6 kí tự'
+                            onChangeText={text => setNewPassword1(text)}>
+                        </TextInput>
+                        <TextInput
+                            style={styles.viewInput}
+                            label="Lặp lại mật khẩu mới"
+                            mode="flat"
+                            value={newPassword2}
+                            secureTextEntry
+                            onChangeText={text => setNewPassword2(text)}>
+                        </TextInput>
+                        <Button mode="contained"
+                            style={[styles.cusButton]}
+                            theme={{ roundness: 0 }}
+                            onPress={() => resetPassword(currentPassword, newPassword1, newPassword2)}
+                        >Xác nhận
+                        </Button>
+                    </View>
+                </View>
+            </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     )
 }
 
@@ -82,9 +91,23 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+    Appbar: {
+        backgroundColor: 'white'
+    },
+    body: {
+        padding: 10,
+        marginTop: 20
+    },
+    text: {
+        alignSelf: 'center',
+        fontSize: 22,
+        marginBottom: 10,
+        fontWeight: 'bold'
+    },
     viewInput: {
         marginBottom: 15,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        borderWidth: 1,
     },
 })
 

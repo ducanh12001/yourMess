@@ -39,29 +39,33 @@ const SignUpForm = () => {
 
   const signUpUser = async () => {
     if (email === '' || password === '') {
-      alert("Please enter details");
+      alert("Vui lòng điền thông tin");
+    } else {
+      await createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+        })
+        .catch((error) => {
+          if (error.code === 'auth/email-already-in-use') {
+            alert('Email đã được sử dụng');
+          } else if (error.code === 'auth/invalid-email') {
+            alert('Email không hợp lệ!');
+          } else {
+            alert(error)
+          }
+        }).then(() => {
+          const uid = auth.currentUser.uid;
+          writeUserData(uid, name, email);
+        }).catch(err => {
+          console.log("Create err" + err);
+        })
     }
-    await createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-      })
-      .catch((error) => {
-        if (error.code === 'auth/email-already-in-use') {
-          alert('That email address is already in use!');
-        } else if (error.code === 'auth/invalid-email' && email != '') {
-          alert('That email address is invalid!');
-        }
-      }).then(() => {
-        const uid = auth.currentUser.uid;
-        writeUserData(uid, name, email);
-      }).catch(err => {
-        console.log("Create err" + err);
-      })
   }
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
+      <View style={{ flex: 1, }}>
         <TextInput
-        style={styles.viewInput}
+          style={styles.viewInput}
           label="Email"
           mode="flat"
           value={email}
@@ -70,7 +74,7 @@ const SignUpForm = () => {
           onChangeText={text => setEmail(text)}
         />
         <TextInput
-        style={styles.viewInput}
+          style={styles.viewInput}
           label="Password"
           mode="flat"
           value={password}
@@ -79,7 +83,7 @@ const SignUpForm = () => {
           onChangeText={text => setPassword(text)}
         />
         <TextInput
-        style={styles.viewInput}
+          style={styles.viewInput}
           label="Nick name"
           mode="flat"
           value={name}
@@ -87,18 +91,19 @@ const SignUpForm = () => {
           onChangeText={text => setName(text)}
         />
 
-      <Button mode="contained"
-        icon="pencil"
-        style={[styles.cusButton]}
-        theme={{ roundness: 0 }}
-        onPress={signUpUser}
-      >Register
-      </Button>
-      <Text onPress={() => {
-        navigation.navigate('Login')
-      }} style={[styles.textOr, { marginLeft: width * 0.2, color: 'green' }]}>
-        If you have account, to login
-      </Text>
+        <Button mode="contained"
+          icon="pencil"
+          style={[styles.cusButton]}
+          theme={{ roundness: 0 }}
+          onPress={signUpUser}
+        >Register
+        </Button>
+        <Text onPress={() => {
+          navigation.navigate('Login')
+        }} style={[styles.textOr, { marginLeft: width * 0.2, color: 'green' }]}>
+          If you have account, to login
+        </Text>
+      </View>
     </KeyboardAvoidingView>
   )
 }

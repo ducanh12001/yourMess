@@ -7,8 +7,8 @@ export const SendMessage = async (currentId, friendId, message, imgUrl) => {
     const time = moment();
     time.locale('vi');
     const createTime = time.format('HH:mm');
-    const createDate = time.format('L');
-    const fullTime = time.format('LLLL');
+    const createDate = time.format('DD/MM');
+    const fullTime = time.format('DD/MM/YYYY HH:mm');
     const ts = serverTimestamp();
     try {
         return await push(child(ref(db, 'chats/' + currentId), friendId + "/messages"), {
@@ -17,8 +17,9 @@ export const SendMessage = async (currentId, friendId, message, imgUrl) => {
             message: message,
             image: imgUrl,
             createTime: createTime,
-            createDate: createDate,
-            time: ts
+            fullTime: fullTime,
+            time: ts,
+            isFriendRead: false,
         }).then((res) => {
             if (message !== '' && imgUrl === '') {
                 message = "Bạn: " + message;
@@ -28,6 +29,7 @@ export const SendMessage = async (currentId, friendId, message, imgUrl) => {
             update(ref(db, `chats/${currentId}/${friendId}`), {
               lastMessage: message,
               createTime: createTime,
+              createDate: createDate,
               fullTime: fullTime,
               ts: ts
             })
@@ -41,8 +43,8 @@ export const RecieveMessage = async (currentId, friendId, message, imgUrl) => {
     const time = moment();
     time.locale('vi');
     const createTime = time.format('HH:mm');
-    const createDate = time.format('L');
-    const fullTime = time.format('LLLL');
+    const createDate = time.format('DD/MM');
+    const fullTime = time.format('DD/MM/YYYY HH:mm');
     const ts = serverTimestamp();
     try {
         return await push(child(ref(db, 'chats/' + friendId), currentId + "/messages"), {
@@ -51,17 +53,19 @@ export const RecieveMessage = async (currentId, friendId, message, imgUrl) => {
             message: message,
             image: imgUrl,
             createTime: createTime,
-            createDate: createDate,
-            time: ts
+            fullTime: fullTime,
+            time: ts,
+            isRead: false,
         }).then((res) => {
             if (message !== '' && imgUrl === '') {
                 message = message;
             } else {
-                message = "đã gửi 1 ảnh"
+                message = "Đã nhận 1 ảnh"
             }
             update(ref(db, `chats/${friendId}/${currentId}`), {
                 lastMessage: message,
                 createTime: createTime,
+                createDate: createDate,
                 fullTime: fullTime,
                 ts:ts
             })

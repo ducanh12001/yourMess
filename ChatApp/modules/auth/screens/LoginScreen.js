@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Image, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TouchableWithoutFeedback, useWindowDimensions, View } from 'react-native';
 import { Card } from 'react-native-paper';
 import LoginForm from '../components/LoginForm';
 
@@ -7,6 +7,8 @@ const LoginScreen = () => {
     const { height } = useWindowDimensions();
 
     return (
+        <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.root}>
             <Card style={[styles.cardView, { height: height * 0.9 }]}>
                 <View style={styles.imageView}>
@@ -20,6 +22,8 @@ const LoginScreen = () => {
                 </View>
             </Card>
         </View>
+        </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     )
 }
 

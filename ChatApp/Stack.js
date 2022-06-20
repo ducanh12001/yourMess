@@ -9,6 +9,8 @@ import { auth, db } from './src/config/firebase';
 import { ref, update } from 'firebase/database';
 import CallComponent from './modules/Chat/components/CallComponent';
 import NewPass from './modules/Home/components/NewPass';
+import NewPassForm from './modules/auth/components/ResetPassword';
+import ResetPassword from './modules/auth/components/ResetPassword';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +30,7 @@ function AuthStack() {
     <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }} >
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={SignUpScreen} />
+      <Stack.Screen name="ResetPassword" component={ResetPassword} />
     </Stack.Navigator>
   )
 }
