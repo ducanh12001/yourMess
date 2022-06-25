@@ -9,8 +9,10 @@ import { auth, db } from './src/config/firebase';
 import { ref, update } from 'firebase/database';
 import CallComponent from './modules/Chat/components/CallComponent';
 import NewPass from './modules/Home/components/NewPass';
-import NewPassForm from './modules/auth/components/ResetPassword';
 import ResetPassword from './modules/auth/components/ResetPassword';
+import Group from './modules/Home/components/Group';
+import { getIdDevice, storeData, updateDevice } from './modules/auth/components/OneSignalFc';
+import OneSignal from 'react-native-onesignal';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +23,7 @@ function AppStack() {
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
       <Stack.Screen name="CallComponent" component={CallComponent} />
       <Stack.Screen name="NewPass" component={NewPass} />
+      <Stack.Screen name="Group" component={Group} />
     </Stack.Navigator>
   )
 }
@@ -39,12 +42,14 @@ export const MainStackNavigator = () => {
   const [user, setUser] = useState(null);
   
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async(user) => {
       if (user) {
         const uid = user.uid;
         setUser(user);
+        const deviceState = await OneSignal.getDeviceState();
         update(ref(db, `users/${uid}`), {
-          status: true
+          status: true,
+          deviceId: deviceState.userId
         }).then(() => {
           console.log("onl");
         }).catch((error) => {

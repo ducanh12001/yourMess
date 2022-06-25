@@ -64,7 +64,9 @@ const StatusComponent = () => {
                             {item.uid === undefined ?
                                 <View></View>
                                 :
-                                <TouchableOpacity onPress={() => navigation.navigate('ChatScreen', { Username: item.username, pImage: item.profileImage, FriendId: item.uid, friendStatus: item.status })} style={{ flexDirection: 'row', borderBottomColor: 'gray', borderBottomWidth: 0.5, padding: 5 }}>
+                                <TouchableOpacity 
+                                onPress={() => navigation.navigate('ChatScreen', { Username: item.username, pImage: item.profileImage, FriendId: item.uid, friendStatus: item.status })} 
+                                style={{ flexDirection: 'row', borderBottomColor: 'gray', borderBottomWidth: 0.5, padding: 5 }}>
                                     <View style={{ width: '15%', alignItems: 'center', justifyContent: 'center' }}>
                                         <Image style={{ width: 50, height: 50, borderRadius: 50 / 2 }} source={{ uri: item.profileImage }}></Image>
                                     </View>

@@ -7,22 +7,22 @@ const LoginScreen = () => {
     const { height } = useWindowDimensions();
 
     return (
-        <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.root}>
-            <Card style={[styles.cardView, { height: height * 0.9 }]}>
-                <View style={styles.imageView}>
-                    <Image source={require('../../../src/images/Logo.png')}
-                        style={[styles.logo, { height: height * 0.3 }]}
-                        resizeMode="contain"
-                    />
+                <View style={styles.root}>
+                    <Card style={[styles.cardView, { height: height * 0.9 }]}>
+                        <View style={styles.imageView}>
+                            <Image source={require('../../../src/images/Logo.png')}
+                                style={[styles.logo, { height: height * 0.3 }]}
+                                resizeMode="contain"
+                            />
+                        </View>
+                        <View style={styles.formView}>
+                            <LoginForm />
+                        </View>
+                    </Card>
                 </View>
-                <View style={styles.formView}>
-                    <LoginForm />
-                </View>
-            </Card>
-        </View>
-        </TouchableWithoutFeedback>
+            </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
     )
 }

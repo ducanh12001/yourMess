@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { child, get, onValue, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Modal, ActivityIndicator } from 'react-native';
 import { Appbar, Avatar, Searchbar } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth, db } from '../../../src/config/firebase';
@@ -14,6 +14,7 @@ const HomeComponent = () => {
     const [allFriendChats, setAllFriendChats] = useState([]);
     const [userBack, setUserBack] = useState('');
     const [loading, setLoading] = useState(false);
+    const [abc, setABC] = useState(false);
 
     const searchUser = (val) => {
         setSearch(val);
@@ -21,39 +22,26 @@ const HomeComponent = () => {
     }
 
     useEffect(() => {
-        setLoading(true);
-        const uid = auth.currentUser.uid;
-        const subcriber = onValue(child(ref(db), 'chats/' + uid), (snapshot) => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            const uid = auth.currentUser.uid;
             const users = [];
-            snapshot.forEach((childSnapshot) => {
-                const childKey = childSnapshot.key;
-                const lastMess = childSnapshot.val().lastMessage;
-                const ts = childSnapshot.val().ts;
-                //const messTime = moment((parseFloat(ts) - 12224)).fromNow();
-                const createDate = childSnapshot.val().createDate;
-                var createTime = '';
-                const c1 = new Date(ts);
-                const c2 = new Date();
-                if (c1.getDate() === c2.getDate()) {
-                    createTime = childSnapshot.val().createTime;
-                } else {
-                    createTime = createDate;
-                }
-                //Date.now() = timestamp
-                onValue(child(ref(db), 'users/' + childKey), (snapshot) => {
-                    const childData = snapshot.val();
-                    users.push({
-                        username: childData.username,
-                        uid: childData.uid,
-                        profileImage: childData.profile_picture,
-                        status: childData.status,
-                        lastMessage: lastMess,
-                        messTime: createTime,
-                        ts: ts
-                    })
-                });
-                /*get(child(ref(db), 'users/' + childKey)).then((snapshot) => {
-                    if (snapshot.exists()) {
+            onValue(child(ref(db), 'chats/' + uid), (snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const childKey = childSnapshot.key;
+                    const lastMess = childSnapshot.val().lastMessage;
+                    const ts = childSnapshot.val().ts;
+                    //const messTime = moment((parseFloat(ts) - 12224)).fromNow();
+                    const createDate = childSnapshot.val().createDate;
+                    var createTime = '';
+                    const c1 = new Date(ts);
+                    const c2 = new Date();
+                    if (c1.getDate() === c2.getDate()) {
+                        createTime = childSnapshot.val().createTime;
+                    } else {
+                        createTime = createDate
+                    }
+                    //Date.now() = timestamp
+                    onValue(child(ref(db), 'users/' + childKey), (snapshot) => {
                         const childData = snapshot.val();
                         users.push({
                             username: childData.username,
@@ -64,27 +52,35 @@ const HomeComponent = () => {
                             messTime: createTime,
                             ts: ts
                         })
-                        users.sort((a, b) => b.ts - a.ts);
-                        setAllFriendChats(users);
-                        setUserBack(users);
-                    } else {
-                        console.log("No data available");
+                    });
+                })
+                //console.log(users)
+            })
+            onValue(child(ref(db), 'rooms/'), (snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    //console.log(childSnapshot);
+                    if (childSnapshot.val().hostId === uid) {
+                        users.push({
+                            username: childSnapshot.val().roomName,
+                            uid: childSnapshot.val().roomId,
+                            profileImage: childSnapshot.val().roomImage,
+                        })
                     }
-                })*/
+                })
             })
             users.sort((a, b) => b.ts - a.ts);
             setAllFriendChats(users);
             setUserBack(users);
         });
-        return subcriber
-    }, []);
+        return unsubscribe;
+    }, [navigation]);
 
     return (
         <View style={styles.container}>
-            <Appbar.Header style={styles.Appbar}>
-                <Appbar.Action icon="menu" />
-                <Appbar.Content title="Chat App" />
+            <Appbar.Header style={styles.Appbar} mode='center-aligned'>
                 <Avatar.Image size={40} source={require('../../../src/images/user.png')} />
+                <Appbar.Content title="Tin nhắn" />
+                <Appbar.Action icon="account-multiple-plus" color="#2694de" size={28} onPress={() => { navigation.navigate('Group') }} />
             </Appbar.Header>
             <Searchbar
                 placeholder="Search user"
@@ -99,16 +95,16 @@ const HomeComponent = () => {
                 renderItem={({ item }) => {
                     return (
                         <>
-                            {item.uid === undefined?
+                            {item.uid === undefined ?
                                 <View></View>
                                 :
                                 <TouchableOpacity onPress={() => navigation.navigate('ChatScreen', { Username: item.username, pImage: item.profileImage, FriendId: item.uid, friendStatus: item.status })} style={{ flexDirection: 'row', borderBottomColor: 'gray', borderBottomWidth: 0.5, padding: 5 }}>
                                     <View style={{ width: '15%', alignItems: 'center', justifyContent: 'center' }}>
                                         <Image style={{ width: 50, height: 50, borderRadius: 50 / 2 }} source={{ uri: item.profileImage }}></Image>
                                     </View>
-                                    <View style={{ width: '70%', alignItems: 'flex-start', marginLeft: 10 }}>
+                                    <View style={{ width: '70%', alignItems: 'flex-start', justifyContent: 'center', marginLeft: 10 }}>
                                         <Text style={{ color: 'black', fontSize: 20, fontWeight: 'bold' }}>{item.username}</Text>
-                                        <Text style={{ color: 'black', fontSize: 16 }}>{item.lastMessage}</Text>
+                                        <Text numberOfLines={1} style={{ color: 'black', fontSize: 16, }}>{item.lastMessage}</Text>
                                     </View>
                                     <View style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
                                         {item.status === false ?
@@ -124,11 +120,7 @@ const HomeComponent = () => {
                     )
                 }}
             />
-            <Spinner
-                visible={loading}
-                textContent={'Loading...'}
-                textStyle={styles.spinnerTextStyle}
-            />
+
         </View>
     )
 }
@@ -138,7 +130,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     Appbar: {
-        backgroundColor: 'white'
+        backgroundColor: 'white',
     },
     status: {
         position: 'absolute',
@@ -146,6 +138,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         right: 0,
         bottom: 0,
+    },
+    circle: {
+        position: 'absolute',
+        backgroundColor: '#abdbe3',
+        margin: 10,
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modal: {
+        backgroundColor: 'white',
+        display: 'flex'
     }
 })
 

@@ -9,6 +9,7 @@ import moment from 'moment';
 import 'moment/locale/vi';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
+import OneSignal from 'react-native-onesignal';
 
 const SignUpForm = () => {
   const navigation = useNavigation();
@@ -19,7 +20,7 @@ const SignUpForm = () => {
 
   const { width } = useWindowDimensions();
 
-  function writeUserData(userId, name, email) {
+  function writeUserData(userId, name, email, deviceId) {
     const time = moment();
     time.locale('vi');
     const createAt = time.format('LLLL');
@@ -34,6 +35,7 @@ const SignUpForm = () => {
       friendList: [],
       friendRequest: [],
       userRequest: [],
+      deviceId: deviceId
     });
   }
 
@@ -52,9 +54,10 @@ const SignUpForm = () => {
           } else {
             alert(error)
           }
-        }).then(() => {
+        }).then(async() => {
           const uid = auth.currentUser.uid;
-          writeUserData(uid, name, email);
+          const deviceState = await OneSignal.getDeviceState();
+          writeUserData(uid, name, email, deviceState.userId);
         }).catch(err => {
           console.log("Create err" + err);
         })

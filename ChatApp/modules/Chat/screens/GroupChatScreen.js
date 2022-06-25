@@ -6,18 +6,18 @@ import { Appbar, Avatar } from 'react-native-paper'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Entypo from 'react-native-vector-icons/Entypo'
 import { auth, db, storage } from '../../../src/config/firebase'
-import { SendMessage, RecieveMessage, sendNotification, sendNoti } from '../components/Mess'
+import { SendMessage, RecieveMessage, sendNotification, sendNoti, SendGroupMess } from '../components/Mess'
 import { launchImageLibrary } from 'react-native-image-picker';
 import * as storageItem from "firebase/storage";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
 
-const ChatScreen = ({ route }) => {
+const GroupChatScreen = ({ route }) => {
   const navigation = useNavigation();
 
   const { Username, pImage } = route.params;
   const [mess, setMess] = useState('');
   const [allMess, setAllMess] = useState([]);
-  const { FriendId, friendStatus } = route.params;
+  const { GroupName, GroupImage, RoomId } = route.params;
   const [fromId, setFromId] = useState('');
   const [currentDevice, setCurrentDevice] = useState('')
   const [friendDevice, setFriendDevice] = useState('')
@@ -33,61 +33,13 @@ const ChatScreen = ({ route }) => {
   useEffect(() => {
     const currentId = auth.currentUser.uid;
     setFromId(currentId);
-    onValue(child(ref(db), 'users'), (snapshot) => {
-      snapshot.forEach((childSnapshot) => {
-        const childData = childSnapshot.val();
-        if (childData.uid === currentId) {
-          setCurrentDevice(childData.deviceId)
-          setName(childData.username)
-        }
-        if (childData.uid === FriendId) {
-          setFriendDevice(childData.deviceId)
-        }
-      })
-    });
 
-    const dbRef = child(child(ref(db, 'chats'), currentId), FriendId + "/messages");
-    const chat = onValue(dbRef, (snapshot) => {
-      const messList = [];
-      snapshot.forEach((childSnapshot) => {
-        const childData = childSnapshot.val();
-        messList.push({
-          fromId: childData.fromId,
-          toId: childData.toId,
-          message: childData.message,
-          image: childData.image,
-          createTime: childData.createTime,
-        })
-      });
-      setAllMess(messList.reverse());
-    });
-    return chat
-  }, []);
+  });
 
   const sendMess = async () => {
-    if (deviceId.indexOf(friendDevice) <= -1) {
-      deviceId.push(friendDevice);
-    }
-    let cDevice = deviceId.indexOf(currentDevice);
-    let empDevice = deviceId.indexOf("")
-    if (cDevice > -1 || empDevice > -1) {
-      deviceId.splice(cDevice, 1)
-      deviceId.splice(empDevice, 1)
-    }
-    
-    console.log(deviceId)
     const currentId = auth.currentUser.uid;
-    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~a-zA-Z0-9]/;
     if (mess.trim()) {
-      SendMessage(currentId, FriendId, mess, "").then((res) => {
-        setMess('');
-        console.log(deviceId)
-        sendNoti(name, mess, deviceId)
-      }).catch(err => {
-        alert(err);
-      })
-
-      RecieveMessage(currentId, FriendId, mess, "").then((res) => {
+      SendGroupMess(currentId, RoomId, mess, '').then((res) => {
         setMess('');
       }).catch(err => {
         alert(err);
@@ -126,15 +78,11 @@ const ChatScreen = ({ route }) => {
         await storageItem.uploadBytes(storageRef, blob, metadata)
           .then(async (snapshot) => {
             const downloadURL = await storageItem.getDownloadURL(storageRef);
-            SendMessage(fromId, FriendId, "", downloadURL).then((res) => {
-            }).catch(err => {
-              alert(err);
-            })
-
-            RecieveMessage(fromId, FriendId, "", downloadURL).then((res) => {
-            }).catch(err => {
-              alert(err);
-            })
+            SendGroupMess(currentId, RoomId, '', downloadURL).then((res) => {
+                setMess('');
+              }).catch(err => {
+                alert(err);
+              })
             blob.close();
           })
       }
@@ -161,13 +109,9 @@ const ChatScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <Appbar style={styles.Appbar}>
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Avatar.Image size={40} source={{ uri: pImage }} />
-        {friendStatus === true ?
-          <Appbar.Content title={Username} subtitle="Đang hoạt động" />
-          :
-          <Appbar.Content title={Username} subtitle="Offline" />
-        }
+        <Appbar.BackAction onPress={() => navigation.navigate('HomeScreen')} />
+        <Avatar.Image size={40} source={{ uri: GroupImage }} />
+        <Appbar.Content title={GroupName} subtitle="Đang hoạt động" />
         <Appbar.Action icon="arrow-down-circle" color="#2694de" size={28} onPress={goDown} />
         <Appbar.Action icon="phone" color="#2694de" size={28} onPress={() => navigation.navigate('CallComponent')} />
         <Appbar.Action icon="video" color="#2694de" size={28} />
@@ -175,7 +119,7 @@ const ChatScreen = ({ route }) => {
       <View style={{ flex: 1 }}>
         <FlatList
           inverted
-          data={allMess}
+          data={{}}
           keyExtractor={(item, index) => index}
           ref={scrollBot}
           renderItem={({ item }) => {
@@ -210,7 +154,6 @@ const ChatScreen = ({ route }) => {
                       </View>
                     }
                   </View>
-
                 }
               </View>
             )
@@ -329,4 +272,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default ChatScreen
+export default GroupChatScreen

@@ -79,7 +79,7 @@ const CallComponent = () => {
   }
 
   return (
-    <SendCall />
+    <InCall />
   )
 }
 

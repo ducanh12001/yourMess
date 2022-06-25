@@ -9,9 +9,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { auth, db, storage } from '../../../src/config/firebase';
 import { signOut } from "firebase/auth";
-import { child, get, ref, update } from 'firebase/database';
+import { child, get, onValue, ref, update } from 'firebase/database';
 import * as storageItem from "firebase/storage";
 import Clipboard from '@react-native-clipboard/clipboard';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const ProfileComponent = () => {
   const navigation = useNavigation();
@@ -23,6 +24,7 @@ const ProfileComponent = () => {
   const [name, setName] = useState('');
   const [image, setImage] = useState('');
   const [addId, setAddId] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
@@ -50,17 +52,21 @@ const ProfileComponent = () => {
   }
 
   useEffect(() => {
-    get(child(ref(db), `users/${auth.currentUser.uid}`)).then((snapshot) => {
-      if (snapshot.exists()) {
-        setName(snapshot.val().username);
-        setImage(snapshot.val().profile_picture);
-        setAddId(snapshot.val().idAdd)
-      } else {
-        console.log("No data available");
+    setLoading(true);
+    const subcriber = onValue(child(ref(db), 'users'), (snapshot) => {
+      if (auth.currentUser) {
+        const uid = auth.currentUser.uid;
+        snapshot.forEach((childSnapshot) => {
+          const childData = childSnapshot.val();
+          if (childData.uid === uid) {
+            setName(childData.username);
+            setImage(childData.profile_picture);
+            setAddId(childData.idAdd)
+          }
+        })
       }
-    }).catch((error) => {
-      console.error(error);
     });
+    return subcriber
   }, []);
 
   const updateProfileImg = async () => {
@@ -130,11 +136,11 @@ const ProfileComponent = () => {
             <Icon name="key" size={30} />
           </View>
           <View style={styles.textSet}>
-            <Text selectable style={{fontSize: 18}}>{addId}</Text>
+            <Text selectable style={{ fontSize: 18 }}>{addId}</Text>
           </View>
-            <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', flex: 2}} onPress={() => Clipboard.setString(addId)}>
-              <Text style={{ color: 'black', borderWidth: 1, padding: 6, fontWeight: 'bold'}}>Copy</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={{ justifyContent: 'center', alignItems: 'center', flex: 2 }} onPress={() => Clipboard.setString(addId)}>
+            <Text style={{ color: 'black', borderWidth: 1, padding: 6, fontWeight: 'bold' }}>Copy</Text>
+          </TouchableOpacity>
         </View>
         <TouchableOpacity style={styles.viewSet} onPress={() => navigation.navigate('NewPass')}>
           <View style={styles.icon}>
@@ -178,6 +184,11 @@ const ProfileComponent = () => {
           <View style={styles.icon}></View>
         </TouchableOpacity>
       </ScrollView>
+      <Spinner
+        visible={loading}
+        textContent={'Loading...'}
+        textStyle={styles.spinnerTextStyle}
+      />
     </View>
   )
 }
@@ -206,7 +217,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flex: 1,
     marginHorizontal: 15,
-    alignItems: 'center', 
+    alignItems: 'center',
     justifyContent: 'center'
   },
   textSet: {
