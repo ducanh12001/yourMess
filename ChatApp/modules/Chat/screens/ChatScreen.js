@@ -10,6 +10,7 @@ import { SendMessage, RecieveMessage, sendNotification, sendNoti } from '../comp
 import { launchImageLibrary } from 'react-native-image-picker';
 import * as storageItem from "firebase/storage";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
+import OneSignal from 'react-native-onesignal';
 
 const ChatScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -45,7 +46,7 @@ const ChatScreen = ({ route }) => {
         }
       })
     });
-
+    handleDevice()
     const dbRef = child(child(ref(db, 'chats'), currentId), FriendId + "/messages");
     const chat = onValue(dbRef, (snapshot) => {
       const messList = [];
@@ -64,24 +65,21 @@ const ChatScreen = ({ route }) => {
     return chat
   }, []);
 
-  const sendMess = async () => {
+  const handleDevice=() => {
     if (deviceId.indexOf(friendDevice) <= -1) {
       deviceId.push(friendDevice);
     }
-    let cDevice = deviceId.indexOf(currentDevice);
-    let empDevice = deviceId.indexOf("")
-    if (cDevice > -1 || empDevice > -1) {
-      deviceId.splice(cDevice, 1)
-      deviceId.splice(empDevice, 1)
-    }
-    
-    console.log(deviceId)
+    let arr = deviceId.filter((value) =>  value !== currentDevice)
+    setDeviceId(arr);
+  }
+
+  const sendMess = async () => {
+    handleDevice()
     const currentId = auth.currentUser.uid;
     const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~a-zA-Z0-9]/;
     if (mess.trim()) {
       SendMessage(currentId, FriendId, mess, "").then((res) => {
         setMess('');
-        console.log(deviceId)
         sendNoti(name, mess, deviceId)
       }).catch(err => {
         alert(err);
@@ -126,7 +124,9 @@ const ChatScreen = ({ route }) => {
         await storageItem.uploadBytes(storageRef, blob, metadata)
           .then(async (snapshot) => {
             const downloadURL = await storageItem.getDownloadURL(storageRef);
+            handleDevice()
             SendMessage(fromId, FriendId, "", downloadURL).then((res) => {
+              sendNoti(name, 'Đã gửi một ảnh', deviceId)
             }).catch(err => {
               alert(err);
             })
@@ -169,7 +169,7 @@ const ChatScreen = ({ route }) => {
           <Appbar.Content title={Username} subtitle="Offline" />
         }
         <Appbar.Action icon="arrow-down-circle" color="#2694de" size={28} onPress={goDown} />
-        <Appbar.Action icon="phone" color="#2694de" size={28} onPress={() => navigation.navigate('CallComponent')} />
+        <Appbar.Action icon="phone" color="#2694de" size={28} onPress={() => navigation.navigate('CallComponent',{roomId : '123'})} />
         <Appbar.Action icon="video" color="#2694de" size={28} />
       </Appbar>
       <View style={{ flex: 1 }}>

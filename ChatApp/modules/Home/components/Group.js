@@ -6,7 +6,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { child, onValue, push, ref, serverTimestamp, set } from 'firebase/database';
 import { auth, db } from '../../../src/config/firebase';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateRoom } from '../../Chat/components/Mess';
 
 const Group = () => {
   const navigation = useNavigation();
@@ -19,6 +18,9 @@ const Group = () => {
   const [count, setCount] = useState();
   const [members, setMembers] = useState();
   const [roomName, setRoomName] = useState('');
+  const [memId, setMemId] = useState();
+  const [memName, setMemName] = useState();
+  const [memPic, setMemPic] = useState();
 
   const searchUser = (val) => {
     setSearch(val);
@@ -34,7 +36,9 @@ const Group = () => {
         snapshot.forEach((childSnapshot) => {
           const childData = childSnapshot.val();
           if (childData.uid === uid) {
-            //console.log(childData.uid);
+            setMemId(childData.uid);
+            setMemName(childData.username);
+            setMemPic(childData.profile_picture)
           } else {
             users.push({
               username: childData.username,
@@ -60,12 +64,16 @@ const Group = () => {
     })
     setAllUsers(arr);
     let count = 0;
-    let newMember = [];
+    let newMember = [{
+      memId: memId,
+      memName: memName,
+      memPic: memPic
+    }];
     let roomName = ''
     for (let i = 0; i < arr.length; i++) {
       if (arr[i].checked) {
         count++;
-        newMember.push({ memId: arr[i].uid, memName: arr[i].username });
+        newMember.push({ memId: arr[i].uid, memName: arr[i].username, memPic: arr[i].profileImage });
         for (let j = 0; j < newMember.length; j++) {
           if (j == 0) {
             roomName = newMember[j].memName;
@@ -80,7 +88,7 @@ const Group = () => {
     setCount(count);
   }
 
-  const createRoom = () => {
+  const createRoom = async () => {
     const uid = auth.currentUser.uid;
     let finalRoomName = '';
     if (groupName.trim() !== '') {
@@ -89,15 +97,17 @@ const Group = () => {
       finalRoomName = roomName;
     }
     const roomId = uuidv4().slice(0, 6);
-    set(ref(db, 'rooms/' + roomId), {
+    await set(ref(db, 'rooms/' + roomId), {
       roomId: roomId,
       roomName: finalRoomName,
       hostId: uid,
       members: members,
       roomImage: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
       ts: serverTimestamp(),
+      lastMessage: "Nhóm được tạo bởi " + memName,
+      time: serverTimestamp()
     }).then(()=> {
-      navigation.navigate('GroupChatScreen', {RoomId :roomId, GroupName: finalRoomName, GroupImage: 'https://cdn-icons-png.flaticon.com/512/149/149071.png'} )
+      navigation.navigate('GroupChatScreen', {RoomId :roomId, GroupName: finalRoomName, Members:members, GroupImage: 'https://cdn-icons-png.flaticon.com/512/149/149071.png'})
     })
   }
 

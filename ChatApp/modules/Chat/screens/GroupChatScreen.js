@@ -17,12 +17,13 @@ const GroupChatScreen = ({ route }) => {
   const { Username, pImage } = route.params;
   const [mess, setMess] = useState('');
   const [allMess, setAllMess] = useState([]);
-  const { GroupName, GroupImage, RoomId } = route.params;
+  const { GroupName, GroupImage, RoomId, Members } = route.params;
   const [fromId, setFromId] = useState('');
   const [currentDevice, setCurrentDevice] = useState('')
   const [friendDevice, setFriendDevice] = useState('')
   const [deviceId, setDeviceId] = useState([])
   const [name, setName] = useState('');
+  const [userPic, setUserPic] = useState();
   const scrollBot = useRef(null);
 
   const [emojiIcon, setEmojiIcon] = useState(true);
@@ -33,14 +34,56 @@ const GroupChatScreen = ({ route }) => {
   useEffect(() => {
     const currentId = auth.currentUser.uid;
     setFromId(currentId);
+    
+    onValue(child(ref(db), 'users'), (snapshot) => {
+      snapshot.forEach((childSnapshot) => {
+        const childData = childSnapshot.val();
+        if (childData.uid === currentId) {
+          setCurrentDevice(childData.deviceId)
+          setName(childData.username)
+        }
+        for (let i=0; i < Members.length; i++) {
+          if (childData.uid === Members[i].memId) {
+            if (deviceId.indexOf(childData.deviceId) <= -1) {
+              deviceId.push(childData.deviceId)
+            }
+          }
+        }
+      })
+    })
+    handleDevice()
+    const chat = onValue(ref(db, 'messages'), (snapshot) => {
+      const messList = [];
+      snapshot.forEach((childSnapshot) => {
+        const childData = childSnapshot.val();
+        if (childData.roomId === RoomId) {
+          onValue(ref(db, `users/${childData.sender}`),(snapshot) => {
+              messList.push({
+                fromId: childData.sender,
+                message: childData.message,
+                image: childData.imgUrl,
+                createTime: childData.createTime,
+                senderImage: snapshot.val().profile_picture
+              })
+          })
+        }
+      })
+      setAllMess(messList.reverse());
+    })
+    return chat;
+  },[]);
 
-  });
+  const handleDevice=() => {
+    let arr = deviceId.filter((value) =>  value !== currentDevice)
+    setDeviceId(arr);
+  }
 
   const sendMess = async () => {
     const currentId = auth.currentUser.uid;
     if (mess.trim()) {
       SendGroupMess(currentId, RoomId, mess, '').then((res) => {
         setMess('');
+        sendNoti(name, mess, deviceId)
       }).catch(err => {
         alert(err);
       })
@@ -78,8 +121,9 @@ const GroupChatScreen = ({ route }) => {
         await storageItem.uploadBytes(storageRef, blob, metadata)
           .then(async (snapshot) => {
             const downloadURL = await storageItem.getDownloadURL(storageRef);
+            handleDevice()
             SendGroupMess(currentId, RoomId, '', downloadURL).then((res) => {
-                setMess('');
+                sendNoti(name, 'Đã gửi một ảnh', deviceId)
               }).catch(err => {
                 alert(err);
               })
@@ -119,7 +163,7 @@ const GroupChatScreen = ({ route }) => {
       <View style={{ flex: 1 }}>
         <FlatList
           inverted
-          data={{}}
+          data={allMess}
           keyExtractor={(item, index) => index}
           ref={scrollBot}
           renderItem={({ item }) => {
@@ -141,7 +185,7 @@ const GroupChatScreen = ({ route }) => {
                   </View>
                   :
                   <View style={styles.viewLeft}>
-                    <Avatar.Image style={{ marginRight: 10 }} size={35} source={{ uri: pImage }} />
+                    <Avatar.Image style={{ marginRight: 10 }} size={35} source={{ uri: item.senderImage }} />
                     {item.image === "" ?
                       <View style={styles.messView}>
                         <Text style={[styles.text, { color: 'white' }]}>{item.message.trimStart().trimEnd()}</Text>

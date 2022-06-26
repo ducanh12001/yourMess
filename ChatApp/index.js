@@ -2,10 +2,9 @@
  * @format
  */
 
-import {AppRegistry} from 'react-native';
+import {AppRegistry, LogBox} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
-import PushNotification from "react-native-push-notification";
 import OneSignal from 'react-native-onesignal';
 
 //OneSignal Init Code
@@ -24,20 +23,9 @@ OneSignal.setNotificationWillShowInForegroundHandler(notificationReceivedEvent =
   // Complete with null means don't show a notification.
   notificationReceivedEvent.complete(notification);
 });
-
 //Method for handling notifications opened
 OneSignal.setNotificationOpenedHandler(notification => {
   //console.log("OneSignal: notification opened:", notification);
 });
 
 AppRegistry.registerComponent(appName, () => App);
-
-PushNotification.configure({
-    // (required) Called when a remote is received or opened, or local notification is opened
-    onNotification: function (notification) {
-      //console.log("NOTIFICATION:", notification);
-    },
-  
-    popInitialNotification: true,
-    requestPermissions: true,
-});

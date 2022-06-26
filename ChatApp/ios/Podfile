@@ -19,6 +19,8 @@ target 'ChatApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  pod 'RNFBFirestore', :path => '../node_modules/@react-native-firebase/firestore'
+
   target 'ChatAppTests' do
     inherit! :complete
     # Pods for testing

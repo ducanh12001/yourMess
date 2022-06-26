@@ -14,7 +14,6 @@ const HomeComponent = () => {
     const [allFriendChats, setAllFriendChats] = useState([]);
     const [userBack, setUserBack] = useState('');
     const [loading, setLoading] = useState(false);
-    const [abc, setABC] = useState(false);
 
     const searchUser = (val) => {
         setSearch(val);
@@ -42,6 +41,7 @@ const HomeComponent = () => {
                     }
                     //Date.now() = timestamp
                     onValue(child(ref(db), 'users/' + childKey), (snapshot) => {
+                        setLoading(true);
                         const childData = snapshot.val();
                         users.push({
                             username: childData.username,
@@ -50,30 +50,52 @@ const HomeComponent = () => {
                             status: childData.status,
                             lastMessage: lastMess,
                             messTime: createTime,
-                            ts: ts
+                            ts: ts,
+                            isRoom: false,
                         })
                     });
                 })
-                //console.log(users)
             })
+            
             onValue(child(ref(db), 'rooms/'), (snapshot) => {
                 snapshot.forEach((childSnapshot) => {
-                    //console.log(childSnapshot);
-                    if (childSnapshot.val().hostId === uid) {
-                        users.push({
-                            username: childSnapshot.val().roomName,
-                            uid: childSnapshot.val().roomId,
-                            profileImage: childSnapshot.val().roomImage,
-                        })
+                    //console.log(childSnapshot.val().members);
+                    const lastMessage = childSnapshot.val().lastMessage;
+                    const createTime = childSnapshot.val().createTime;
+                    const ts = childSnapshot.val().time;
+                    const members = childSnapshot.val().members;
+
+                    for (let i = 0; i < members.length; i++) {
+                        if (members[i].memId === uid) {
+                            users.push({
+                                username: childSnapshot.val().roomName,
+                                uid: childSnapshot.val().roomId,
+                                profileImage: childSnapshot.val().roomImage,
+                                isRoom: true,
+                                lastMessage: lastMessage,
+                                messTime: createTime,
+                                ts: ts,
+                                members: members
+                            })
+                        }
                     }
                 })
             })
             users.sort((a, b) => b.ts - a.ts);
             setAllFriendChats(users);
             setUserBack(users);
+            console.log(users);
         });
         return unsubscribe;
     }, [navigation]);
+
+    const goChat = async (item) => {
+        if (!item.isRoom) {
+            navigation.navigate('ChatScreen', { Username: item.username, pImage: item.profileImage, FriendId: item.uid, friendStatus: item.status })
+        } else {
+            navigation.navigate('GroupChatScreen', { RoomId: item.uid, GroupName: item.username, GroupImage: item.profileImage, Members: item.members })
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -98,7 +120,9 @@ const HomeComponent = () => {
                             {item.uid === undefined ?
                                 <View></View>
                                 :
-                                <TouchableOpacity onPress={() => navigation.navigate('ChatScreen', { Username: item.username, pImage: item.profileImage, FriendId: item.uid, friendStatus: item.status })} style={{ flexDirection: 'row', borderBottomColor: 'gray', borderBottomWidth: 0.5, padding: 5 }}>
+                                <TouchableOpacity
+                                    onPress={() => goChat(item)}
+                                    style={{ flexDirection: 'row', borderBottomColor: 'gray', borderBottomWidth: 0.5, padding: 5 }}>
                                     <View style={{ width: '15%', alignItems: 'center', justifyContent: 'center' }}>
                                         <Image style={{ width: 50, height: 50, borderRadius: 50 / 2 }} source={{ uri: item.profileImage }}></Image>
                                     </View>
@@ -107,10 +131,12 @@ const HomeComponent = () => {
                                         <Text numberOfLines={1} style={{ color: 'black', fontSize: 16, }}>{item.lastMessage}</Text>
                                     </View>
                                     <View style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
-                                        {item.status === false ?
+                                        {!item.isRoom && item.status === false ? 
                                             <Ionicons name="radio-button-on" color='gray' size={18} />
-                                            :
+                                            : !item.isRoom && item.status === true ? 
                                             <Ionicons name="radio-button-on" color='green' size={18} />
+                                            : 
+                                            <></>
                                         }
                                         <Text style={{ color: 'black', fontSize: 14 }}>{item.messTime}</Text>
                                     </View>
@@ -120,7 +146,11 @@ const HomeComponent = () => {
                     )
                 }}
             />
-
+            <Spinner
+                visible={loading}
+                textContent={'Loading...'}
+                textStyle={styles.spinnerTextStyle}
+            />
         </View>
     )
 }

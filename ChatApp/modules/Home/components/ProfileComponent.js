@@ -41,6 +41,7 @@ const ProfileComponent = () => {
     await signOut(auth).then(() => {
       update(ref(db, `users/${currentUser}`), {
         status: false,
+        deviceId: null
       }).then(() => {
         console.log("off");
       }).catch((error) => {

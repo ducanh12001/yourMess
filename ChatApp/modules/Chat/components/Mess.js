@@ -76,20 +76,33 @@ export const RecieveMessage = async (currentId, friendId, message, imgUrl) => {
     }
 }
 
-export const SendGroupMess = async (currentId, roomId, message, imgUrl) => {
+export const SendGroupMess = async (currentId, roomId, message, imgUrl, senderImage) => {
+    const time = moment();
+    time.locale('vi');
+    const createTime = time.format('HH:mm');
+    const createDate = time.format('DD/MM');
+    const fullTime = time.format('DD/MM/YYYY HH:mm');
+    const ts = serverTimestamp();
     try {
-        return await push(ref(db, 'messages')), {
+        await push(child(ref(db), 'messages'), {
             roomId: roomId,
             message: message,
             imgUrl: imgUrl,
-            sender: currentId
-        }.then(() => {
-            update(ref(db, `rooms`)), {
-
-            }
+            sender: currentId,
+            createTime: createTime,
+            fullTime: fullTime,
+            time: ts,
+        }).then((res) => {
+            update(ref(db, `rooms/${roomId}`), {
+                lastMessage: message,
+                createTime: createTime,
+                createDate: createDate,
+                fullTime: fullTime,
+                time:ts
+            })
         })
     }catch (err) {
-        alert(err);
+        console.log("abc" + err);
     }
 }
 

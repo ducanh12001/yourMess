@@ -33,8 +33,6 @@ const SignUpForm = () => {
       createAt: createAt,
       idAdd: uuidv4().slice(0, 8),
       friendList: [],
-      friendRequest: [],
-      userRequest: [],
       deviceId: deviceId
     });
   }

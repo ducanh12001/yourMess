@@ -11,8 +11,9 @@ import CallComponent from './modules/Chat/components/CallComponent';
 import NewPass from './modules/Home/components/NewPass';
 import ResetPassword from './modules/auth/components/ResetPassword';
 import Group from './modules/Home/components/Group';
-import { getIdDevice, storeData, updateDevice } from './modules/auth/components/OneSignalFc';
 import OneSignal from 'react-native-onesignal';
+import GroupChatScreen from './modules/Chat/screens/GroupChatScreen';
+import { useNavigation } from '@react-navigation/native';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +22,7 @@ function AppStack() {
     <Stack.Navigator initialRouteName="HomeScreen" screenOptions={{ headerShown: false }} >
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
+      <Stack.Screen name="GroupChatScreen" component={GroupChatScreen} />
       <Stack.Screen name="CallComponent" component={CallComponent} />
       <Stack.Screen name="NewPass" component={NewPass} />
       <Stack.Screen name="Group" component={Group} />
@@ -39,9 +41,14 @@ function AuthStack() {
 }
 
 export const MainStackNavigator = () => {
+  const navigation = useNavigation()
   const [user, setUser] = useState(null);
   
   useEffect(() => {
+    OneSignal.setNotificationOpenedHandler(notification => {
+      //navigation.navigate('ChatScreen', {Username: notification.notification.title})
+      //console.log(notification.notification.title)
+    });
     const unsubscribe = onAuthStateChanged(auth, async(user) => {
       if (user) {
         const uid = user.uid;

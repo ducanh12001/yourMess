@@ -26,7 +26,7 @@ const NewPass = () => {
             reauthenticateWithCredential(user, credential).then(() => {
                 updatePassword(user, newPass2).then(() => {
                     // Update successful.
-                    alert("reset ok")
+                    alert("Đổi mật khẩu thành công")
                     navigation.navigate('HomeScreen');
                 }).catch((error) => {
                     alert(error)
